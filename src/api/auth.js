@@ -1,7 +1,7 @@
 import axios from 'axios';
 
 const ins = axios.create({
-  baseURL: 'http://localhost:8081/',
+  baseURL: process.env.VUE_APP_API_URL,
 });
 
 // 회원가입 메일 요청
