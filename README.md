@@ -25,6 +25,7 @@
 17. [X] [다이나믹 라우팅 매칭](./md/dynamicRoutingMatching.md)
 18. [X] [에러 처리](./md/errorHandling.md)
 19. [X] [유효성 검사](./md/validationCheck.md)
+20. [X] [Vuex](./md/vuex.md)
 
 # slack_practice_vue
 

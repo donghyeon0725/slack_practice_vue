@@ -16,6 +16,12 @@ npm i vue-router
 
 <br/>
 
+📌 공식문서
+-
+* <https://router.vuejs.org/guide/essentials/navigation.html>
+
+<br/>
+
 📌 뷰 라우터의 인스턴스 생성
 -
 * src/routes/index.js 파일을 생성해서 아래와 같은 코드를 집어넣는다.
@@ -212,6 +218,8 @@ await this.$router.push('/페이지');
 * this.$router.push 메소드는 promise 객체를 반환하고 비동기로 작동하는 코드이기 때문에 await와 사용하는 것이 바람직하다.
 
 
+
+<br/>
 
 
 

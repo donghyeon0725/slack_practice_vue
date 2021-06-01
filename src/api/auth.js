@@ -18,4 +18,9 @@ function join(formData, joinToken) {
   });
 }
 
-export { signupMail, join };
+// 로그인
+function login(formData) {
+  return ins.post('users/login', formData);
+}
+
+export { signupMail, join, login };
