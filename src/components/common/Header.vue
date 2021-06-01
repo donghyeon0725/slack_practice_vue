@@ -9,7 +9,6 @@
     <div v-if="isLogin">
       <b-nav>
         <b-nav-item href="javascript:;" @click="logout">로그아웃</b-nav-item>
-        <b-nav-item :to="{ path: '/login' }">로그인</b-nav-item>
       </b-nav>
     </div>
   </header>
@@ -20,7 +19,7 @@ export default {
   name: 'Header',
   methods: {
     logout() {
-      this.$store.commit('clearLogin');
+      this.$store.dispatch('logout');
       this.$router.push('/');
     },
   },

@@ -27,6 +27,11 @@
 19. [X] [유효성 검사](./md/validationCheck.md)
 20. [X] [Vuex](./md/vuex.md)
 21. [X] [라우터 가드](./md/routerGuard.md)
+22. [X] [interceptor와 api 이용시 vuex 사용의 문제점](./md/interceptor.md)
+23. [X] [프론트 엔트 api 문서화](./md/jsDoc.md)
+24. [X] [Spinner 를 추가하여, 비동기 통신의 단점을 보완하기](./md/spinner.md)
+25. [X] [쿠키를 사용하여, vuex의 단점 보완하기](./md/cookie.md)
+26. [X] [유용한 아이콘 사이트](./md/icon.md)
 
 # slack_practice_vue
 

@@ -32,5 +32,21 @@
     "sass": "^1.34.0",
     "vue-template-compiler": "^2.6.11",
     "webpack": "^4.0.0"
-  }
+  },
+  "description": "📌 노드 버전 - 10.16.3",
+  "main": ".eslintrc.js",
+  "directories": {
+    "test": "tests"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/donghyeon0725/slack_practice_vue.git"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/donghyeon0725/slack_practice_vue/issues"
+  },
+  "homepage": "https://github.com/donghyeon0725/slack_practice_vue#readme"
 }

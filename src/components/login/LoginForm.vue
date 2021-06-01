@@ -39,7 +39,6 @@
 </template>
 
 <script>
-import { login } from '@/api/auth';
 import { validateEmail } from '@/util/validation';
 
 export default {
@@ -57,7 +56,7 @@ export default {
     async onSubmit(event) {
       event.preventDefault();
       try {
-        const { status } = await login(this.form);
+        const { status } = await this.$store.dispatch('login', this.form);
 
         if (status == 200) {
           this.$store.commit('setLoginEmail', this.form.email);
