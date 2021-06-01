@@ -13,12 +13,18 @@ export default new VueRouter({
       redirect: 'login',
     },
     {
-      path: '/login', // 경로 선언
-      component: () => import('@/views/LoginPage.vue'), // 장치 선택
+      path: '/login',
+      component: () => import('@/views/LoginPage.vue'),
     },
     {
+      // 회원가입 메일 요청 페이지
       path: '/signup',
       component: () => import('@/views/SignupPage.vue'),
+    },
+    {
+      // 회원가입 페이지
+      path: '/join/:email/:token',
+      component: () => import('@/views/JoinPage.vue'),
     },
     {
       path: '*',

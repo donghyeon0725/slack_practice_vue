@@ -9,4 +9,13 @@ function signupMail(email) {
   return ins.get(`users/join/${email}`);
 }
 
-export { signupMail };
+// 회원가입
+function join(formData, joinToken) {
+  return ins.post('users', formData, {
+    headers: {
+      'X-AUTH-TOKEN': joinToken,
+    },
+  });
+}
+
+export { signupMail, join };

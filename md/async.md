@@ -61,6 +61,23 @@ function registerUser() {
 export { registerUser };
 ```
 
+* 별도로 해더를 첨부하고 싶은 경우 아래와 같이 합니다
+```javascript
+import axios from 'axios';
+
+function registerUser() {
+  const url = 'http://localhost:3000/signup';
+  return axios.post(url, undefined, {
+                                        headers: {
+                                          'X-AUTH-TOKEN': joinToken,
+                                        },
+                                      });
+}
+
+export { registerUser };
+```
+
+
 * 사용할 때는 아래와 같은 방법으로 사용합니다.
 ```javascript
 import { registerUser } from '@/api/index';

@@ -19,11 +19,12 @@
 11. [X] [package.json 파일](./md/package.md)   
 12. [X] [페이지 기본 작성법](./md/page.md)   
 13. [X] [기본 문법 상기](./md/basic.md)    
-14. [X] [비동기 요청 라이브러리](./md/async.md)   
+14. [X] [비동기 요청 라이브러리 (axios)](./md/async.md)   
 15. [X] [뷰 부트스트랩](./md/vueTstrap.md)      
 16. [X] [환경 변수](./md/env.md)
-
-
+17. [X] [다이나믹 라우팅 매칭](./md/dynamicRoutingMatching.md)
+18. [X] [에러 처리](./md/errorHandling.md)
+19. [X] [유효성 검사](./md/validationCheck.md)
 
 # slack_practice_vue
 
