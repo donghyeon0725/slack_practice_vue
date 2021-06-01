@@ -26,6 +26,7 @@
 18. [X] [에러 처리](./md/errorHandling.md)
 19. [X] [유효성 검사](./md/validationCheck.md)
 20. [X] [Vuex](./md/vuex.md)
+21. [X] [라우터 가드](./md/routerGuard.md)
 
 # slack_practice_vue
 

@@ -63,9 +63,10 @@ export default {
           this.$store.commit('setLoginEmail', this.form.email);
           alert(`${this.form.email}님 반갑습니다.`);
         }
-        await this.$router.push('/');
+        await this.$router.push('/main');
         return;
       } catch (e) {
+        console.log(e);
         if (e.response.status == 415)
           console.log(
             '로그인을 위한 데이터가 잘못 되었습니다. 요청을 확인하세요',
