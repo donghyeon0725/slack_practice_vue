@@ -201,6 +201,17 @@ mode: 'history',
 * 다만, local 개발 환경에서는 위와 같은 설정을 해주지 않아도 정상 동작한다.
 
 
+<br/>
+
+
+📌 라우터 페이지 이동
+-
+```javascript
+await this.$router.push('/페이지');
+```
+* this.$router.push 메소드는 promise 객체를 반환하고 비동기로 작동하는 코드이기 때문에 await와 사용하는 것이 바람직하다.
+
+
 
 
 

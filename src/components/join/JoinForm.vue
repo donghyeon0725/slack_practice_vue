@@ -92,12 +92,13 @@ export default {
         alert('비밀번호를 확인해주세요.');
         return;
       }
-
       try {
         const { status } = await join(this.form, this.form.token);
 
-        if (status == 202) {
+        if (status == 201) {
           alert('가입에 성공했습니다');
+          await this.$router.push('/');
+          return;
         }
       } catch (e) {
         alert(e.response.data.message);
