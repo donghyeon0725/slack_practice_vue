@@ -37,3 +37,14 @@ router.beforeEach((to, from, next) => {
 });
 ```
 
+* 위 코드를 보면 to.meta.auth 라는 값이 if 문 안에 들어가 있는 것이 보이는데, 해당 값은 페이지에 권한이 필요한지 여부를 부여하기 위함이다.
+* 아래와 같은 라우터 객체를 라우터에 끼우면, 해당 페이지는 권한이 필요한 것이 된다.
+```javascript
+{
+  path: '/main',
+  component: () => import('@/views/MainPage.vue'),
+  meta: { auth: true },
+},
+```
+
+

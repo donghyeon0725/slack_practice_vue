@@ -1,8 +1,6 @@
-import axios from 'axios';
+import { getInstance } from '@/api/index';
 
-const ins = axios.create({
-  baseURL: process.env.VUE_APP_API_URL,
-});
+const ins = getInstance();
 
 /**
  * 회원 가입 메일을 요청합니다.

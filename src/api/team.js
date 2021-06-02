@@ -1,15 +1,6 @@
-import axios from 'axios';
-import { setInterceptors } from './common/interceptors';
+import { getInstanceWithAuth } from '@/api/index';
 
-// 인스턴스 요청
-function getInstance() {
-  const instance = axios.create({
-    baseURL: process.env.VUE_APP_API_URL,
-  });
-  return setInterceptors(instance);
-}
-
-const instance = getInstance();
+const instance = getInstanceWithAuth();
 
 // 팀 리스트 요청
 function teamList() {
