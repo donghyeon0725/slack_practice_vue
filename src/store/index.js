@@ -6,6 +6,10 @@ import {
   getAuthFromCookie,
   getUserEmailFromCookie,
   deleteCookie,
+  // getJsonValueFromCookie,
+  // deleteJsonValueFromCookie,
+  getJsonFromCookie,
+  saveJsonToCookie,
 } from '@/util/cookie';
 import { login } from '@/api/auth';
 
@@ -18,6 +22,7 @@ export default new Vuex.Store({
   state: {
     email: getUserEmailFromCookie() || '', // username 이라는 값을 어디에서든 사용할 수 있게 되었다.
     token: getAuthFromCookie() || '',
+    page: getJsonFromCookie() || {},
   },
   mutations: {
     // 첫번째 인자로 state 를 받아야 한다.
@@ -33,11 +38,20 @@ export default new Vuex.Store({
     setToken(state, token) {
       state.token = token;
     },
+    setPage(state, json) {
+      state.json = json;
+    },
+    clearPage(state) {
+      state.json = {};
+    },
   },
   getters: {
     // 첫번째 인자로 state 를 받아야 한다.
     isLogin(state) {
       return state.email !== '';
+    },
+    getPageInfo(state) {
+      return state.page;
     },
   },
   actions: {
@@ -62,6 +76,15 @@ export default new Vuex.Store({
 
       deleteCookie('til_auth');
       deleteCookie('til_user');
+    },
+    addPageInfo({ commit }, json) {
+      let keys = Object.keys(json);
+
+      for (let key of keys) {
+        saveJsonToCookie(key, json[keys]);
+      }
+
+      commit('setPage', getJsonFromCookie());
     },
   },
 });

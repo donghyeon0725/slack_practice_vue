@@ -20,6 +20,9 @@ const router = new VueRouter({
     {
       path: '/main',
       component: () => import('@/views/MainPage.vue'),
+      meta: {
+        auth: true,
+      },
     },
     {
       // 회원가입 메일 요청 페이지

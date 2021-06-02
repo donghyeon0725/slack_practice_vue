@@ -1,23 +1,19 @@
 <template>
-  <div
-    style="
-      position: absolute;
-      top: 50%;
-      left: 50%;
-      transform: translate(-50%, -50%);
-    "
-  >
+  <div class="container">
     <Spinner v-if="loading"></Spinner>
-    메인 페이지
+    <div class="side">
+      <SideList></SideList>
+    </div>
   </div>
 </template>
 
 <script>
 import Spinner from '@/components/common/Spinner';
+import SideList from '@/components/main/SideList';
 
 export default {
   name: 'MainPage',
-  components: { Spinner },
+  components: { Spinner, SideList },
   data() {
     return {
       loading: false, // true로 변경해서 확인해보세요.
@@ -27,7 +23,13 @@ export default {
 </script>
 
 <style>
-#app {
-  margin: 20px;
+.container {
+  margin: 20px 0 0 0;
+  padding: 0;
+  display: flex;
+}
+
+.side {
+  flex-basis: 400px;
 }
 </style>

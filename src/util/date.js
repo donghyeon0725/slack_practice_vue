@@ -10,4 +10,9 @@ function formatDate(value) {
   return `${year}-${month}-${day} ${hours}:${minutes}`;
 }
 
-export { formatDate };
+function dayAgo(s) {
+  let dayAgoTime = new Date() - new Date(s);
+  return Math.floor(dayAgoTime / (3600 * 24 * 1000));
+}
+
+export { formatDate, dayAgo };
