@@ -64,7 +64,7 @@ import TeamForm from '@/components/main/side/TeamForm';
 import BoardForm from '@/components/main/side/BoardForm';
 
 export default {
-  name: 'SideList',
+  name: 'Team',
   components: {
     Board,
     TeamForm,

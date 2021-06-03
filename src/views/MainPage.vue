@@ -2,7 +2,7 @@
   <div class="container">
     <Spinner v-if="loading"></Spinner>
     <div class="side">
-      <SideList></SideList>
+      <TeamList></TeamList>
     </div>
     <div class="center">
       <router-view></router-view>
@@ -12,11 +12,11 @@
 
 <script>
 import Spinner from '@/components/common/Spinner';
-import SideList from '@/components/main/SideList';
+import TeamList from '@/components/main/Team';
 
 export default {
   name: 'MainPage',
-  components: { Spinner, SideList },
+  components: { Spinner, TeamList },
   data() {
     return {
       loading: false, // true로 변경해서 확인해보세요.
