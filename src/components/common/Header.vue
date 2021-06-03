@@ -1,13 +1,13 @@
 <template>
   <header>
     <div v-if="!isLogin">
-      <b-nav>
+      <b-nav style="justify-content: flex-end">
         <b-nav-item :to="{ path: '/login' }">로그인</b-nav-item>
         <b-nav-item :to="{ path: '/signup' }">회원가입</b-nav-item>
       </b-nav>
     </div>
     <div v-if="isLogin">
-      <b-nav>
+      <b-nav style="justify-content: flex-end">
         <b-nav-item href="javascript:;" @click="logout">로그아웃</b-nav-item>
       </b-nav>
     </div>

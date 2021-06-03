@@ -9,7 +9,7 @@
 import Header from '@/components/common/Header';
 
 export default {
-  name: 'main',
+  name: 'app',
   components: {
     Header,
   },

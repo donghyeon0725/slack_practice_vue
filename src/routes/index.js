@@ -4,7 +4,8 @@ import Vue from 'vue';
 import VueRouter from 'vue-router';
 import store from '@/store/index';
 
-Vue.use(VueRouter); // 라우터를 플러그인으로 사용할 것을 명시
+// 뷰 어플리케이션에 라우터 플러그인을 추가한다.
+Vue.use(VueRouter);
 
 const router = new VueRouter({
   mode: 'history',
@@ -23,6 +24,12 @@ const router = new VueRouter({
       meta: {
         auth: true,
       },
+      children: [
+        {
+          path: ':teamId',
+          component: () => import('@/views/MainCenterPage.vue'),
+        },
+      ],
     },
     {
       // 회원가입 메일 요청 페이지

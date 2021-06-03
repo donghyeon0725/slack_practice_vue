@@ -4,6 +4,9 @@
     <div class="side">
       <SideList></SideList>
     </div>
+    <div class="center">
+      <router-view></router-view>
+    </div>
   </div>
 </template>
 

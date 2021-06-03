@@ -18,11 +18,22 @@ import { login } from '@/api/auth';
  * */
 Vue.use(Vuex);
 
+/* 페이지 정보를 객체가 아닌, 메소드로 만듬으로써, 페이지를 리로드 할 때에 쿠키 데이터를 계속 조회할 수 있도록 변경 */
+const PAGE_DATA = () => {
+  return {
+    init: getJsonFromCookie()['init'] || false,
+    boards: getJsonFromCookie()['boards'] || [],
+    teams: getJsonFromCookie()['teams'] || [],
+    selectedTeamIdx: getJsonFromCookie()['selectedTeamIdx'] || 0,
+    selectedTeam: getJsonFromCookie()['selectedTeam'] || {},
+  };
+};
+
 export default new Vuex.Store({
   state: {
-    email: getUserEmailFromCookie() || '', // username 이라는 값을 어디에서든 사용할 수 있게 되었다.
+    email: getUserEmailFromCookie() || '',
     token: getAuthFromCookie() || '',
-    page: getJsonFromCookie() || {},
+    page: PAGE_DATA(),
   },
   mutations: {
     // 첫번째 인자로 state 를 받아야 한다.
@@ -38,27 +49,45 @@ export default new Vuex.Store({
     setToken(state, token) {
       state.token = token;
     },
-    setPage(state, json) {
-      state.json = json;
+
+    /* 분리 */
+    setBoards(state, value) {
+      state.page.boards = value;
     },
-    clearPage(state) {
-      state.json = {};
+    clearBoards(state) {
+      state.page.boards = [];
+    },
+    setTeams(state, value) {
+      state.page.teams = value;
+    },
+    clearTeams(state) {
+      state.page.teams = [];
+    },
+    setSelectedTeamIdx(state, value) {
+      state.page.selectedTeamIdx = value;
+    },
+    clearSelectedTeamIdx(state) {
+      state.page.selectedTeamIdx = 0;
+    },
+    setSelectedTeam(state, value) {
+      state.page.selectedTeam = value;
+    },
+    clearSelectedTeam(state) {
+      state.page.selectedTeam = {};
+    },
+    setInit(state, bool) {
+      state.page.init = bool;
     },
   },
   getters: {
-    // 첫번째 인자로 state 를 받아야 한다.
     isLogin(state) {
       return state.email !== '';
-    },
-    getPageInfo(state) {
-      return state.page;
     },
   },
   actions: {
     async login({ commit }, userData) {
       // 로그인을 수행해서, 토큰을 받아온다.
       const response = await login(userData);
-      console.log(response);
 
       // 커밋 작업으로 store에 값을 세팅한다. (또는 쿠키로 저장해두고 페이지를 리로드 처리한다)
       commit('setToken', response.data);
@@ -68,6 +97,10 @@ export default new Vuex.Store({
       saveAuthToCookie(response.data);
       saveUserEmailToCookie(userData.email);
 
+      // 페이지 초기화 해야하는 상태로 setting
+      commit('setInit', true);
+      saveJsonToCookie('init', true);
+
       return response;
     },
     logout({ commit }) {
@@ -76,15 +109,28 @@ export default new Vuex.Store({
 
       deleteCookie('til_auth');
       deleteCookie('til_user');
+      deleteCookie('til_page');
     },
-    addPageInfo({ commit }, json) {
-      let keys = Object.keys(json);
-
-      for (let key of keys) {
-        saveJsonToCookie(key, json[keys]);
-      }
-
-      commit('setPage', getJsonFromCookie());
+    /* 필요한 값을 페이지 정보의 특정 키워드로 저장 해둡니다. */
+    setBoards({ commit }, list) {
+      commit('setBoards', list || []);
+      saveJsonToCookie('boards', list);
+    },
+    setTeams({ commit }, list) {
+      commit('setTeams', list || []);
+      saveJsonToCookie('teams', list);
+    },
+    setSelectedTeamIdx({ commit }, int) {
+      commit('setSelectedTeamIdx', int || 0);
+      saveJsonToCookie('selectedTeamIdx', int);
+    },
+    setSelectedTeam({ commit }, obj) {
+      commit('setSelectedTeam', obj || {});
+      saveJsonToCookie('selectedTeam', obj);
+    },
+    initComplete({ commit }) {
+      commit('setInit', false);
+      saveJsonToCookie('init', false);
     },
   },
 });

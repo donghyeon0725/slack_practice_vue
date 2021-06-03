@@ -59,7 +59,6 @@ export default {
         const { status } = await this.$store.dispatch('login', this.form);
 
         if (status == 200) {
-          this.$store.commit('setLoginEmail', this.form.email);
           alert(`${this.form.email}님 반갑습니다.`);
         }
         await this.$router.push('/main');
