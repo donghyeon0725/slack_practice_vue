@@ -100,6 +100,9 @@ export default new Vuex.Store({
     isLogin(state) {
       return state.email !== '';
     },
+    selectedTeam(state) {
+      return state.page.selectedTeam;
+    },
   },
   actions: {
     async login({ commit }, userData) {

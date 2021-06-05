@@ -44,16 +44,22 @@
             {{ team.description }}
           </b-card-text>
 
-          <!-- 보드 생성 버튼 -->
+          <!-- 보드 생성 버튼 && 보드 폼 -->
           <b-card-text>
-            <BoardForm :team="team"></BoardForm>
+            <b-button
+              v-b-modal="'board_modal-' + team_idx"
+              block
+              variant="outline-dark"
+              style="width: 100%"
+              >보드 생성하기</b-button
+            >
+            <BoardForm :id="'board_modal-' + team_idx"></BoardForm>
           </b-card-text>
 
           <!-- 보드 -->
           <b-card-text>
             <Board
               v-if="isActiveTeam(team_idx)"
-              :team="team"
               :isActived="isActiveTeam(team_idx)"
             ></Board>
           </b-card-text>

@@ -1,19 +1,6 @@
 <template>
   <div>
-    <b-button
-      v-b-modal.modal-footer-cu
-      block
-      variant="outline-dark"
-      style="width: 100%"
-      >보드 생성하기</b-button
-    >
-
-    <b-modal
-      id="modal-footer-cu"
-      title="Board"
-      button-size="sm"
-      @ok="createBoard"
-    >
+    <b-modal :id="id" title="Board" button-size="sm" @ok="createBoard">
       <template #modal-header="{}">
         <h5>Board</h5>
       </template>
@@ -57,7 +44,7 @@
       </template>
     </b-modal>
 
-    <b-modal id="BoardResultModal" cancel-only
+    <b-modal :id="'BoardResultModal-' + id" cancel-only
       >{{ resContent }}
       <template #modal-footer="{ cancel }">
         <b-button size="sm" variant="danger" @click="cancel()"> 닫기 </b-button>
@@ -72,8 +59,8 @@ import { createBoard } from '@/api/board';
 export default {
   name: 'BoardForm',
   props: {
-    team: {
-      type: Object,
+    id: {
+      type: Number,
       required: true,
     },
   },
@@ -82,7 +69,7 @@ export default {
       form: {
         title: '',
         content: '',
-        teamId: this.team.id,
+        teamId: '',
       },
       resContent: '',
     };
@@ -98,6 +85,7 @@ export default {
     },
     async createBoard() {
       try {
+        this.form.teamId = this.$store.getters.selectedTeam.id;
         this.resContent = '보드가 생성 되었습니다.';
         let result = await createBoard(this.form);
         console.log(result);
@@ -107,7 +95,7 @@ export default {
         }
       }
 
-      await this.$root.$emit('bv::show::modal', 'BoardResultModal');
+      await this.$bvModal.show('BoardResultModal-' + this.id);
 
       await this.$store.dispatch('refreshSetting');
     },
