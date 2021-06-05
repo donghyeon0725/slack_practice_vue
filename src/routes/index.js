@@ -26,8 +26,8 @@ const router = new VueRouter({
       },
       children: [
         {
-          path: ':teamId',
-          component: () => import('@/views/MainCenterPage.vue'),
+          path: ':boardId',
+          component: () => import('@/views/BoardPage.vue'),
         },
       ],
     },

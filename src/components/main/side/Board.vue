@@ -2,7 +2,7 @@
   <b-nav pills v-if="boards.length > 0">
     <b-nav-item-dropdown
       :id="'dropdown' + team.id"
-      text="보드를 선택하세요."
+      :text="selectedBoard.title"
       toggle-class="nav-link-custom"
       right
       style="width: inherit"
@@ -11,7 +11,11 @@
         style="width: 100%"
         :key="'dropdown' + board_idx"
         v-for="(board, board_idx) in boards"
-        >{{ board.title }}</b-dropdown-item
+        @click="activatedBoard(board_idx)"
+      >
+        <b-nav-item :to="{ path: '/main/' + board_idx }">{{
+          board.title
+        }}</b-nav-item></b-dropdown-item
       >
       <!--<b-dropdown-divider></b-dropdown-divider>-->
     </b-nav-item-dropdown>
@@ -19,12 +23,30 @@
 </template>
 
 <script>
+// import { getBoards } from '@/api/board';
+
 export default {
   name: 'Board',
   props: {
     isActived: {
       type: Boolean,
       required: true,
+    },
+  },
+  methods: {
+    async changeActivatedBoard(board_idx) {
+      let boards = this.$store.state.page.boards;
+      let selectedIdx = Number(board_idx);
+
+      await this.$store.dispatch('setSelectedBoardIdx', selectedIdx);
+      await this.$store.dispatch('setSelectedBoard', boards[selectedIdx]);
+
+      /*try {
+        const { data } = await getCard(boards[selectedIdx].id);
+        await this.$store.dispatch('setCard', data);
+      } catch (e) {
+        console.log(e);
+      }*/
     },
   },
   computed: {
@@ -48,6 +70,19 @@ export default {
       },
       set(list) {
         this.$store.commit('setBoards', list);
+      },
+    },
+    selectedBoard: {
+      get() {
+        if (this.isActived) {
+          let selectedBoard = this.$store.state.page.selectedBoard;
+          if (Object.keys(selectedBoard).length != 0) return selectedBoard;
+        }
+
+        return { title: '보드를 선택하세요.' };
+      },
+      set(obj) {
+        this.$store.commit('setSelectedBoard', obj);
       },
     },
   },

@@ -93,21 +93,23 @@ export default {
       alert(JSON.stringify(this.form));
     },
     onReset() {
-      this.form.name = '';
-      this.form.description = '';
+      this.form.title = '';
+      this.form.content = '';
     },
     async createBoard() {
       try {
-        await createBoard(this.form);
-
         this.resContent = '보드가 생성 되었습니다.';
-        this.$root.$emit('bv::show::modal', 'BoardResultModal');
+        let result = await createBoard(this.form);
+        console.log(result);
       } catch (e) {
         if (e.response.status == 409) {
           this.resContent = '이미 보드를 생성하셨습니다.';
-          this.$root.$emit('bv::show::modal', 'BoardResultModal');
         }
       }
+
+      await this.$root.$emit('bv::show::modal', 'BoardResultModal');
+
+      await this.$store.dispatch('refreshSetting');
     },
   },
   mounted() {

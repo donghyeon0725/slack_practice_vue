@@ -4,7 +4,7 @@
 
 <script>
 export default {
-  name: 'MainCenterPage.vue',
+  name: 'BoardPage',
 };
 </script>
 

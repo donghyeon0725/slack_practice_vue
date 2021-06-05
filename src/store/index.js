@@ -10,8 +10,11 @@ import {
   // deleteJsonValueFromCookie,
   getJsonFromCookie,
   saveJsonToCookie,
+  savewholeJsonToCookie,
 } from '@/util/cookie';
 import { login } from '@/api/auth';
+import { getTeams } from '@/api/team';
+import { getBoards } from '@/api/board';
 
 /**
  * vuex를 사용합니다.
@@ -26,6 +29,8 @@ const PAGE_DATA = () => {
     teams: getJsonFromCookie()['teams'] || [],
     selectedTeamIdx: getJsonFromCookie()['selectedTeamIdx'] || 0,
     selectedTeam: getJsonFromCookie()['selectedTeam'] || {},
+    selectedBoardIdx: getJsonFromCookie()['selectedBoardIdx'] || -1,
+    selectedBoard: getJsonFromCookie()['selectedBoard'] || {},
   };
 };
 
@@ -69,14 +74,26 @@ export default new Vuex.Store({
     clearSelectedTeamIdx(state) {
       state.page.selectedTeamIdx = 0;
     },
-    setSelectedTeam(state, value) {
-      state.page.selectedTeam = value;
+    setSelectedTeam(state, obj) {
+      state.page.selectedTeam = obj;
     },
     clearSelectedTeam(state) {
       state.page.selectedTeam = {};
     },
     setInit(state, bool) {
       state.page.init = bool;
+    },
+    setSelectedBoardIdx(state, int) {
+      state.page.selectedBoardIdx = int;
+    },
+    clearSelectedBoardIdx(state) {
+      state.page.selectedBoardIdx = -1;
+    },
+    setSelectedBoard(state, obj) {
+      state.page.selectedBoard = obj;
+    },
+    clearSelectedBoard(state) {
+      state.page.selectedBoard = {};
     },
   },
   getters: {
@@ -112,13 +129,13 @@ export default new Vuex.Store({
       deleteCookie('til_page');
     },
     /* 필요한 값을 페이지 정보의 특정 키워드로 저장 해둡니다. */
-    setBoards({ commit }, list) {
-      commit('setBoards', list || []);
-      saveJsonToCookie('boards', list);
-    },
     setTeams({ commit }, list) {
       commit('setTeams', list || []);
       saveJsonToCookie('teams', list);
+    },
+    setBoards({ commit }, list) {
+      commit('setBoards', list || []);
+      saveJsonToCookie('boards', list);
     },
     setSelectedTeamIdx({ commit }, int) {
       commit('setSelectedTeamIdx', int || 0);
@@ -128,9 +145,75 @@ export default new Vuex.Store({
       commit('setSelectedTeam', obj || {});
       saveJsonToCookie('selectedTeam', obj);
     },
+    setSelectedBoardIdx({ commit }, int) {
+      commit('setSelectedBoardIdx', int || -1);
+      saveJsonToCookie('selectedBoardIdx', int);
+    },
+    setSelectedBoard({ commit }, obj) {
+      commit('setSelectedBoard', obj || {});
+      saveJsonToCookie('selectedBoard', obj);
+    },
     initComplete({ commit }) {
       commit('setInit', false);
       saveJsonToCookie('init', false);
+    },
+    init({ commit }) {
+      commit('setInit', false);
+      commit('setTeams', []);
+      commit('setBoards', []);
+      commit('setSelectedTeamIdx', 0);
+      commit('setSelectedTeam', {});
+      commit('setSelectedBoardIdx', -1);
+      commit('setSelectedBoard', {});
+
+      const initConfig = {
+        init: false,
+        teams: [],
+        boards: [],
+        selectedTeamIdx: 0,
+        selectedTeam: {},
+        selectedBoardIdx: -1,
+        selectedBoard: {},
+      };
+
+      savewholeJsonToCookie(initConfig);
+    },
+    async refreshSetting(context) {
+      let teams = (await getTeams()).data;
+
+      console.log(teams);
+
+      if (teams.length > 0) {
+        let selectedTeamIdx = this.state.page.selectedTeamIdx;
+        let selectedTeam = teams[selectedTeamIdx];
+
+        let boards = (await getBoards(selectedTeam.id)).data;
+        let selectedBoardIdx = this.state.page.selectedBoardIdx;
+        let selectedBoard = {};
+        if (selectedBoardIdx != -1) selectedBoard = boards[selectedBoardIdx];
+
+        context.commit('setInit', true);
+        context.commit('setTeams', teams);
+        context.commit('setSelectedTeam', selectedTeam);
+        context.commit('setSelectedTeamIdx', selectedTeamIdx);
+        context.commit('setBoards', boards);
+        context.commit('setSelectedBoard', selectedBoard);
+        context.commit('setSelectedBoardIdx', selectedBoardIdx);
+
+        const initConfig = {
+          init: false,
+          teams: teams,
+          boards: boards,
+          selectedTeamIdx: selectedTeamIdx,
+          selectedTeam: selectedTeam,
+          selectedBoardIdx: selectedBoardIdx,
+          selectedBoard: selectedBoard,
+        };
+
+        savewholeJsonToCookie(initConfig);
+      } else {
+        await context.dispatch('init', context);
+      }
     },
   },
 });

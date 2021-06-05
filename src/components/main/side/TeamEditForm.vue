@@ -1,19 +1,8 @@
 <template>
-  <div>
-    <b-button
-      v-b-modal.modal-footer-sm
-      block
-      variant="outline-dark"
-      style="width: 100%"
-      >팀 생성하기</b-button
-    >
+  <span>
+    <b-link v-b-modal.modal-edit block><b-icon icon="pencil"></b-icon></b-link>
 
-    <b-modal
-      id="modal-footer-sm"
-      title="Team"
-      button-size="sm"
-      @ok="createTeam"
-    >
+    <b-modal id="modal-edit" title="Team" button-size="sm" @ok="modifyTeam">
       <template #modal-header="{}">
         <h5>Team</h5>
       </template>
@@ -52,28 +41,29 @@
 
       <template #modal-footer="{ ok, cancel }">
         <!-- Emulate built in modal footer ok and cancel button actions -->
-        <b-button size="sm" variant="primary" @click="ok()">생성하기</b-button>
+        <b-button size="sm" variant="primary" @click="ok()">수정하기</b-button>
         <b-button size="sm" variant="danger" @click="cancel()"> 취소 </b-button>
       </template>
     </b-modal>
 
-    <b-modal id="TeamCreateResult" cancel-only
+    <b-modal id="TeamEditResult" cancel-only
       >{{ resContent }}
       <template #modal-footer="{ cancel }">
         <b-button size="sm" variant="danger" @click="cancel()"> 닫기 </b-button>
       </template>
     </b-modal>
-  </div>
+  </span>
 </template>
 
 <script>
-import { createTeam } from '@/api/team';
+import { editTeam } from '@/api/team';
 
 export default {
-  name: 'TeamForm',
+  name: 'TeamEditForm',
   data() {
     return {
       form: {
+        id: '',
         name: '',
         description: '',
       },
@@ -89,31 +79,34 @@ export default {
       this.form.name = '';
       this.form.description = '';
     },
-    async createTeam() {
+    async modifyTeam() {
       try {
-        let result = await createTeam(this.form);
-        this.resContent = '팀이 생성 되었습니다.';
-        console.log(result);
+        await editTeam(this.form);
+        this.resContent = '팀이 수정 되었습니다.';
       } catch (e) {
-        if (
-          Object.prototype.hasOwnProperty.call(e, 'response') &&
-          e.response.status == 409
-        ) {
-          this.resContent = '이미 팀을 생성하셨습니다.';
-        } else {
-          this.resContent = '에러가 발생했습니다.';
+        if (e.response.status == 409) {
+          this.resContent = '수정 도중 에러가 났습니다.';
         }
       }
-
       // 결과창 모달 호출
-      await this.$root.$emit('bv::show::modal', 'TeamCreateResult');
+      this.$root.$emit('bv::show::modal', 'TeamEditResult');
 
+      let selectedTeamIdx = await this.$store.state.page.selectedTeamIdx;
+      let selectedBoardIdx = await this.$store.state.page.selectedBoardIdx;
+
+      await this.$store.dispatch('setSelectedTeamIdx', selectedTeamIdx);
+      await this.$store.dispatch('setSelectedBoardIdx', selectedBoardIdx);
       await this.$store.dispatch('refreshSetting');
     },
   },
   mounted() {
-    this.$root.$on('bv::modal::show', () => {
+    this.$root.$on('bv::modal::show', async () => {
       this.onReset();
+
+      let selectedTeam = await this.$store.state.page.selectedTeam;
+      this.form.id = selectedTeam.id;
+      this.form.name = selectedTeam.name;
+      this.form.description = selectedTeam.description;
     });
   },
 };

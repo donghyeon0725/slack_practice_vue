@@ -1,7 +1,7 @@
 <template>
-  <div class="container">
+  <div class="container p-0 m-0" style="height: 100vh">
     <Spinner v-if="loading"></Spinner>
-    <div class="side">
+    <div class="side me-2" style="background: #f7f6f3">
       <TeamList></TeamList>
     </div>
     <div class="center">

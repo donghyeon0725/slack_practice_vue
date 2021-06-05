@@ -17,16 +17,26 @@
           >{{ team.name }}</b-button
         >
       </b-card-header>
+
       <b-collapse
         :id="'accordion' + team_idx"
         :visible="isActiveTeam(team_idx)"
         accordion="my-accordion"
         role="tabpanel"
+        style="background: #f7f6f3"
       >
         <b-card-body>
           <b-card-text>
             <div class="d-flex w-100 justify-content-between">
-              <h5 class="mb-1">{{ team.name }}</h5>
+              <h5 class="mb-1">
+                {{ team.name }}
+                <!-- 팀 수정 버튼 -->
+                <TeamEditForm v-if="team.state == 'CREATOR'"></TeamEditForm>
+                <!-- 팀 삭제 버튼 -->
+                <b-link block @click="deleteTeam" v-if="team.state == 'CREATOR'"
+                  ><b-icon icon="x"></b-icon
+                ></b-link>
+              </h5>
               <small>{{ team.date | dayAgo }} days ago</small>
             </div>
           </b-card-text>
@@ -53,68 +63,57 @@
 
     <!-- 팀 생성 버튼 + TeamForm 모달 -->
     <TeamForm></TeamForm>
+
+    <!-- 결과창 -->
+    <b-modal id="TeamResult" cancel-only
+      >{{ resContent }}
+      <template #modal-footer="{ cancel }">
+        <b-button size="sm" variant="danger" @click="cancel()"> 닫기 </b-button>
+      </template>
+    </b-modal>
   </div>
 </template>
 
 <script>
-import { getTeams } from '@/api/team';
-import { getBoards } from '@/api/board';
+import { deleteTeam } from '@/api/team';
 import Board from '@/components/main/side/Board';
 import TeamForm from '@/components/main/side/TeamForm';
 import BoardForm from '@/components/main/side/BoardForm';
+import TeamEditForm from '@/components/main/side/TeamEditForm';
 
 export default {
   name: 'Team',
+  data() {
+    return {
+      resContent: '',
+    };
+  },
   components: {
     Board,
     TeamForm,
     BoardForm,
-  },
-  data() {
-    return {};
+    TeamEditForm,
   },
   methods: {
     async changeActive(idx) {
-      let teams = this.$store.state.page.teams;
-
       await this.$store.dispatch('setSelectedTeamIdx', idx);
-      await this.$store.dispatch('setSelectedTeam', teams[Number(idx)]);
-
-      const { data } = await getBoards(teams[Number(idx)].id);
-      await this.$store.dispatch('setBoards', data);
+      await this.$store.dispatch('setSelectedBoardIdx', -1);
+      await this.$store.dispatch('refreshSetting');
     },
-    async getTeams() {
-      try {
-        const { data } = await getTeams();
-        this.teams = data;
-
-        return data;
-      } catch (e) {
-        console.log(e);
-      }
-    },
-    async getBoards() {
+    async deleteTeam() {
       try {
         let selectedTeam = await this.$store.state.page.selectedTeam;
-        const { data } = await getBoards(selectedTeam.id);
-        return data;
+        let result = await deleteTeam(selectedTeam.id);
+        this.resContent = '삭제 성공했습니다';
+        console.log(result);
       } catch (e) {
+        this.resContent = '에러가 발생했습니다.';
         console.log(e);
       }
-    },
-    /* 페이지 정보 초기화 */
-    async init(teams, boards) {
-      try {
-        let init = 0;
 
-        // 팀, 정보 setting
-        await this.$store.dispatch('setTeams', teams);
-        await this.$store.dispatch('setSelectedTeamIdx', init);
-        await this.$store.dispatch('setSelectedTeam', teams[init]);
-        await this.$store.dispatch('setBoards', boards);
-      } catch (e) {
-        console.log(e);
-      }
+      await this.$root.$emit('bv::show::modal', 'TeamResult');
+
+      await this.$store.dispatch('refreshSetting');
     },
   },
   computed: {
@@ -142,11 +141,11 @@ export default {
   },
   async created() {
     if (this.$store.state.page.init) {
-      let teams = await this.getTeams();
-      let boards = await this.getBoards();
-      await this.init(teams, boards);
-      await this.$store.dispatch('initComplete');
+      await this.$store.dispatch('init');
     }
+
+    await this.$store.dispatch('refreshSetting');
+    await this.$store.dispatch('initComplete');
   },
 };
 </script>

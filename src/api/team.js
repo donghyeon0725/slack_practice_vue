@@ -12,4 +12,14 @@ function createTeam(teamData) {
   return instance.post('teams', teamData);
 }
 
-export { getTeams, createTeam };
+// 팀 수정하기
+function editTeam(teamData) {
+  return instance.patch('teams', teamData);
+}
+
+// 팀 삭제하기
+function deleteTeam(id) {
+  return instance.delete(`teams/${id}`);
+}
+
+export { getTeams, createTeam, editTeam, deleteTeam };

@@ -14,6 +14,11 @@ function saveJsonToCookie(key, value) {
   document.cookie = `til_page=${JSON.stringify(json)}`;
 }
 
+/* 한번에 그 값을 저장합니다. */
+function savewholeJsonToCookie(json) {
+  document.cookie = `til_page=${JSON.stringify(json)}`;
+}
+
 /* json 데이터를 가져옵니다. */
 function getJsonFromCookie() {
   return JSON.parse(
@@ -65,4 +70,5 @@ export {
   deleteJsonValueFromCookie,
   getJsonValueFromCookie,
   getJsonFromCookie,
+  savewholeJsonToCookie,
 };

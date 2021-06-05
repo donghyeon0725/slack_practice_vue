@@ -1,5 +1,8 @@
 <template>
-  <header>
+  <header
+    style="background: linear-gradient(45deg, #e7e6e3, #cbbde2)"
+    class="p-2"
+  >
     <div v-if="!isLogin">
       <b-nav style="justify-content: flex-end">
         <b-nav-item :to="{ path: '/login' }">로그인</b-nav-item>
