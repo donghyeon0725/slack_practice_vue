@@ -31,6 +31,9 @@ const PAGE_DATA = () => {
     selectedTeam: getJsonFromCookie()['selectedTeam'] || {},
     selectedBoardIdx: getJsonFromCookie()['selectedBoardIdx'] || -1,
     selectedBoard: getJsonFromCookie()['selectedBoard'] || {},
+    cards: getJsonFromCookie()['cards'] || [],
+    selectedCardIdx: getJsonFromCookie()['selectedCardIdx'] || 0,
+    selectedCard: getJsonFromCookie()['selectedCard'] || {},
   };
 };
 
@@ -141,7 +144,7 @@ export default new Vuex.Store({
       saveJsonToCookie('boards', list);
     },
     setSelectedTeamIdx({ commit }, int) {
-      commit('setSelectedTeamIdx', int || 0);
+      commit('setSelectedTeamIdx', int);
       saveJsonToCookie('selectedTeamIdx', int);
     },
     setSelectedTeam({ commit }, obj) {
@@ -149,7 +152,7 @@ export default new Vuex.Store({
       saveJsonToCookie('selectedTeam', obj);
     },
     setSelectedBoardIdx({ commit }, int) {
-      commit('setSelectedBoardIdx', int || -1);
+      commit('setSelectedBoardIdx', int);
       saveJsonToCookie('selectedBoardIdx', int);
     },
     setSelectedBoard({ commit }, obj) {
@@ -181,10 +184,24 @@ export default new Vuex.Store({
 
       savewholeJsonToCookie(initConfig);
     },
+    async refreshTeamAndBoard(context) {
+      let teams = this.state.page.teams;
+      let boards = this.state.page.boards;
+
+      let selectedTeamIdx = this.state.page.selectedTeamIdx;
+      let selectedTeam = teams[selectedTeamIdx];
+
+      let selectedBoardIdx = this.state.page.selectedBoardIdx;
+      let selectedBoard = {};
+      if (selectedBoardIdx != -1) selectedBoard = boards[selectedBoardIdx];
+
+      context.commit('setSelectedTeam', selectedTeam);
+      context.commit('setSelectedTeamIdx', selectedTeamIdx);
+      context.commit('setSelectedBoard', selectedBoard);
+      context.commit('setSelectedBoardIdx', selectedBoardIdx);
+    },
     async refreshSetting(context) {
       let teams = (await getTeams()).data;
-
-      console.log(teams);
 
       if (teams.length > 0) {
         let selectedTeamIdx = this.state.page.selectedTeamIdx;

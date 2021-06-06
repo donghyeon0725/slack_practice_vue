@@ -1,5 +1,5 @@
 <template>
-  <b-nav pills v-if="boards.length > 0">
+  <b-nav v-if="boards.length > 0">
     <b-nav-item-dropdown
       :id="'dropdown' + team.id"
       :text="selectedBoard.title"
@@ -11,7 +11,7 @@
         style="width: 100%"
         :key="'dropdown' + board_idx"
         v-for="(board, board_idx) in boards"
-        @click="activatedBoard(board_idx)"
+        @click="changeActivatedBoard(board_idx)"
       >
         <b-nav-item :to="{ path: '/main/' + board_idx }">{{
           board.title
@@ -35,11 +35,8 @@ export default {
   },
   methods: {
     async changeActivatedBoard(board_idx) {
-      let boards = this.$store.state.page.boards;
-      let selectedIdx = Number(board_idx);
-
-      await this.$store.dispatch('setSelectedBoardIdx', selectedIdx);
-      await this.$store.dispatch('setSelectedBoard', boards[selectedIdx]);
+      await this.$store.dispatch('setSelectedBoardIdx', Number(board_idx));
+      await this.$store.dispatch('refreshTeamAndBoard');
 
       /*try {
         const { data } = await getCard(boards[selectedIdx].id);

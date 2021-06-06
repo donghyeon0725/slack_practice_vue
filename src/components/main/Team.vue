@@ -6,7 +6,6 @@
       v-for="(team, team_idx) in teams"
       :key="team_idx"
       :active="isActiveTeam(team_idx)"
-      @click="changeActive(team_idx)"
     >
       <b-card-header header-tag="header" class="p-1" role="tab">
         <b-button
@@ -14,6 +13,7 @@
           v-b-toggle="'accordion' + team_idx"
           variant="info"
           style="width: 100%; height: 100%"
+          @click="changeActive(team_idx)"
           >{{ team.name }}</b-button
         >
       </b-card-header>
