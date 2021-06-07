@@ -33,6 +33,7 @@
 25. [X] [쿠키를 사용하여, vuex의 단점 보완하기](./md/cookie.md)
 26. [X] [유용한 아이콘 사이트](./md/icon.md)
 27. [X] [vue Filter 적용하기](./md/filter.md)
+28. [X] [전역 함수 등록 (플러그인 만들기)](./md/plugin.md)
 
 # slack_practice_vue
 
