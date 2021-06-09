@@ -1,23 +1,21 @@
 <template>
-  <span>
-    <b-link v-b-modal="modal_id" block><b-icon icon="pencil"></b-icon></b-link>
-
-    <b-modal :id="modal_id" title="Team" button-size="sm" @ok="modifyTeam">
+  <div>
+    <b-modal :id="id" title="Board" button-size="sm" @ok="modifyBoard">
       <template #modal-header="{}">
-        <h5>Team</h5>
+        <h5>Board</h5>
       </template>
 
       <b-form @reset="onReset">
         <b-form-group
           id="input-group-1"
-          label="Team Title:"
+          label="Board Title:"
           label-for="input-1"
         >
           <b-form-input
             id="input-1"
-            v-model="form.name"
+            v-model="form.title"
             type="text"
-            placeholder="Enter Team Title"
+            placeholder="Enter Board Title"
             autocomplete="off"
             required
           ></b-form-input>
@@ -25,14 +23,14 @@
 
         <b-form-group
           id="input-group-2"
-          label="Team Description:"
+          label="Board Description:"
           label-for="input-2"
           class="mb-2"
         >
           <b-form-input
             id="input-2"
-            v-model="form.description"
-            placeholder="Team Description"
+            v-model="form.content"
+            placeholder="Board Description"
             autocomplete="off"
             required
           ></b-form-input>
@@ -40,27 +38,33 @@
       </b-form>
 
       <template #modal-footer="{ ok, cancel }">
+        <!-- Emulate built in modal footer ok and cancel button actions -->
         <b-button size="sm" variant="primary" @click="ok()">수정하기</b-button>
         <b-button size="sm" variant="danger" @click="cancel()"> 취소 </b-button>
       </template>
     </b-modal>
-  </span>
+  </div>
 </template>
 
 <script>
-import { editTeam } from '@/api/team';
+import { modifyBoard } from '@/api/board';
 
 export default {
-  name: 'TeamEditForm',
+  name: 'BoardEditForm',
   data() {
     return {
-      modal_id: 'team-edit-form',
       form: {
-        id: '',
-        name: '',
-        description: '',
+        title: '',
+        content: '',
+        id: this.$route.params.boardId,
       },
     };
+  },
+  props: {
+    id: {
+      type: String,
+      required: true,
+    },
   },
   methods: {
     onSubmit(event) {
@@ -68,38 +72,36 @@ export default {
       alert(JSON.stringify(this.form));
     },
     onReset() {
-      this.form.name = '';
-      this.form.description = '';
+      this.form.title = '';
+      this.form.content = '';
     },
-    async modifyTeam() {
+    async modifyBoard() {
       let msg = '';
+
       try {
-        await editTeam(this.form);
-        msg = '수정 되었습니다.';
+        msg = '보드가 수정 되었습니다.';
+        await modifyBoard(this.form);
         this.$defualtToast(msg);
       } catch (e) {
-        if (e.response.status == 409) {
-          msg = '수정 도중 에러가 났습니다.';
-        }
+        msg = '에러 발생';
         this.$defualtToast(msg, { type: 'error' });
       }
 
-      await this.$store.dispatch('refreshOnlyTeams');
-      // await this.$router.push(this.$router.currentRoute);
+      await this.$store.dispatch(
+        'refreshOnlyBoards',
+        this.$route.params.teamId,
+      );
     },
   },
   mounted() {
     this.$root.$on('bv::modal::show', async (evt, mId) => {
-      if (mId == this.modal_id) {
-        this.onReset();
+      if (mId == this.id) {
+        let boardId = this.$route.params.boardId;
+        let board =
+          this.$store.state.page.boards.filter(s => s.id == boardId)[0] || [];
 
-        let teamId = this.$route.params.teamId;
-        let teams = this.$store.state.page.teams;
-        let team = teams.filter(s => s.id == teamId)[0];
-
-        this.form.id = team.id;
-        this.form.name = team.name;
-        this.form.description = team.description;
+        this.form.title = board.title;
+        this.form.content = board.content;
       }
     });
   },

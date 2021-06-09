@@ -4,4 +4,14 @@ function validateEmail(email) {
   return re.test(String(email).toLowerCase());
 }
 
-export { validateEmail };
+function isEmpty(value) {
+  if (typeof value === 'undefined' || value === '' || value === null)
+    return true;
+  return false;
+}
+
+function isNotEmpty(value) {
+  return !isEmpty(value);
+}
+
+export { validateEmail, isEmpty, isNotEmpty };

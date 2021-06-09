@@ -5,22 +5,26 @@
       class="mb-1"
       v-for="(team, team_idx) in teams"
       :key="team_idx"
-      :active="isActiveTeam(team_idx)"
+      :active="isActiveTeam(team.id)"
     >
-      <b-card-header header-tag="header" class="p-1" role="tab">
+      <b-card-header
+        header-tag="header"
+        class="p-1"
+        role="tab"
+        @click="changeActive(team.id)"
+      >
         <b-button
           block
           v-b-toggle="'accordion' + team_idx"
           variant="info"
           style="width: 100%; height: 100%"
-          @click="changeActive(team_idx)"
           >{{ team.name }}</b-button
         >
       </b-card-header>
 
       <b-collapse
         :id="'accordion' + team_idx"
-        :visible="isActiveTeam(team_idx)"
+        :visible="isActiveTeam(team.id)"
         accordion="my-accordion"
         role="tabpanel"
         style="background: #f7f6f3"
@@ -59,8 +63,8 @@
           <!-- 보드 -->
           <b-card-text>
             <Board
-              v-if="isActiveTeam(team_idx)"
-              :isActived="isActiveTeam(team_idx)"
+              v-if="isActiveTeam(team.id)"
+              :isActived="isActiveTeam(team.id)"
             ></Board>
           </b-card-text>
         </b-card-body>
@@ -69,19 +73,11 @@
 
     <!-- 팀 생성 버튼 + TeamForm 모달 -->
     <TeamForm></TeamForm>
-
-    <!-- 결과창 -->
-    <b-modal id="TeamResult" cancel-only
-      >{{ resContent }}
-      <template #modal-footer="{ cancel }">
-        <b-button size="sm" variant="danger" @click="cancel()"> 닫기 </b-button>
-      </template>
-    </b-modal>
   </div>
 </template>
 
 <script>
-import { deleteTeam } from '@/api/team';
+import { deleteTeam, getTeams } from '@/api/team';
 import Board from '@/components/main/side/Board';
 import TeamForm from '@/components/main/side/TeamForm';
 import BoardForm from '@/components/main/side/BoardForm';
@@ -89,11 +85,6 @@ import TeamEditForm from '@/components/main/side/TeamEditForm';
 
 export default {
   name: 'Team',
-  data() {
-    return {
-      resContent: '',
-    };
-  },
   components: {
     Board,
     TeamForm,
@@ -101,31 +92,42 @@ export default {
     TeamEditForm,
   },
   methods: {
-    async changeActive(idx) {
-      await this.$store.dispatch('setSelectedTeamIdx', idx);
-      await this.$store.dispatch('setSelectedBoardIdx', -1);
-      await this.$store.dispatch('refreshSetting');
+    async changeActive(id) {
+      if (this.$route.params.teamId == id) return;
+      await this.$router.push('/main/' + id);
     },
     async deleteTeam() {
-      try {
-        let selectedTeam = await this.$store.state.page.selectedTeam;
-        let result = await deleteTeam(selectedTeam.id);
-        this.resContent = '삭제 성공했습니다';
-        console.log(result);
-      } catch (e) {
-        this.resContent = '에러가 발생했습니다.';
-        console.log(e);
+      let modal = {
+        title: '삭제',
+        message: '팀을 삭제 하시 겠습니까?',
+      };
+
+      let confirm = await this.$confirmModal(modal.title, modal.message);
+      if (confirm) {
+        let msg = '';
+        try {
+          let selectedTeamId = this.$route.params.teamId;
+          await deleteTeam(selectedTeamId);
+          msg = '삭제 성공했습니다';
+          this.$defualtToast(msg);
+        } catch (e) {
+          msg = '에러가 발생했습니다.';
+          console.log(e);
+          this.$defualtToast(msg, { type: 'error' });
+        }
+
+        await this.$store.dispatch('refreshTeamsAndEmptyOther');
+        await this.$router.push('/main');
       }
-
-      await this.$root.$emit('bv::show::modal', 'TeamResult');
-
-      await this.$store.dispatch('refreshSetting');
     },
   },
   computed: {
     isActiveTeam() {
       return id => {
-        return id == this.$store.state.page.selectedTeamIdx;
+        let teamId = this.$route.params.teamId;
+        if (this.$isEmpty(teamId)) return false;
+
+        return id == this.$route.params.teamId;
       };
     },
     teams: {
@@ -133,26 +135,50 @@ export default {
         return this.$store.state.page.teams;
       },
       set(list) {
-        this.$store.dispatch('setTeams', list);
-      },
-    },
-    activeTeamIdx: {
-      get() {
-        return this.$store.state.page.selectedTeamIdx;
-      },
-      set(int) {
-        this.$store.dispatch('setSelectedTeamIdx', int);
+        this.$store.commit('setTeams', list);
       },
     },
   },
   async created() {
-    if (this.$store.state.page.init) {
-      await this.$store.dispatch('init');
+    try {
+      let { data } = await getTeams();
+      this.$store.commit('setTeams', data);
+    } catch (e) {
+      console.log(e);
     }
 
-    await this.$store.dispatch('refreshSetting');
-    await this.$store.dispatch('initComplete');
+    // 값 확인
+    let teams = this.$store.state.page.teams;
+    let id = this.$route.params.teamId;
+
+    /*
+      1. 팀이 없는 경우
+      2. 팀은 있는데, 팀 입력값이 잘못된 경우 => pageNotFound
+      3. 팀이 있는데, 선택을 안한 경우
+      4. 팀은 있도 있고, 팀 입력값도 있는 경우 => 해당 페이지로
+      * */
+    if (teams.length <= 0) {
+      // 팀이 없는 경우
+      console.log('팀이 없습니다');
+      return;
+    } else {
+      if (this.$isEmpty(id)) {
+        console.log('팀이 있는데, 선택을 안한 경우');
+        return;
+      }
+      teams = teams.filter(s => s.id == id);
+      // 팀이 있고, 팀을 못 찾은 경우
+      if (teams.length <= 0) {
+        console.log('팀이 있고, 팀을 못 찾은 경우');
+        // await this.$router.push('/pageNotFound');
+      }
+      // 팀이 있고, 팀을 찾은 경우
+      else {
+        console.log('팀이 있고, 팀을 찾은 경우');
+      }
+    }
   },
+  async mounted() {},
 };
 </script>
 
@@ -167,5 +193,18 @@ export default {
   color: #000;
   text-shadow: 0 1px 0 #fff;
   opacity: 0.5;
+}
+.btn-block.collapsed {
+  background-color: #c4e2ec;
+  border-color: #c4e2ec;
+  font-weight: 900;
+}
+.btn-block.not-collapsed {
+  background-color: #c4e2ec;
+  border-color: #c4e2ec;
+  font-weight: 900;
+}
+h5 {
+  font-weight: 600;
 }
 </style>

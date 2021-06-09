@@ -8,13 +8,11 @@ import {
   deleteCookie,
   // getJsonValueFromCookie,
   // deleteJsonValueFromCookie,
-  getJsonFromCookie,
-  saveJsonToCookie,
-  savewholeJsonToCookie,
 } from '@/util/cookie';
 import { login } from '@/api/auth';
 import { getTeams } from '@/api/team';
 import { getBoards } from '@/api/board';
+import { getCards } from '@/api/card';
 
 /**
  * vuex를 사용합니다.
@@ -24,16 +22,9 @@ Vue.use(Vuex);
 /* 페이지 정보를 객체가 아닌, 메소드로 만듬으로써, 페이지를 리로드 할 때에 쿠키 데이터를 계속 조회할 수 있도록 변경 */
 const PAGE_DATA = () => {
   return {
-    init: getJsonFromCookie()['init'] || false,
-    boards: getJsonFromCookie()['boards'] || [],
-    teams: getJsonFromCookie()['teams'] || [],
-    selectedTeamIdx: getJsonFromCookie()['selectedTeamIdx'] || 0,
-    selectedTeam: getJsonFromCookie()['selectedTeam'] || {},
-    selectedBoardIdx: getJsonFromCookie()['selectedBoardIdx'] || -1,
-    selectedBoard: getJsonFromCookie()['selectedBoard'] || {},
-    cards: getJsonFromCookie()['cards'] || [],
-    selectedCardIdx: getJsonFromCookie()['selectedCardIdx'] || 0,
-    selectedCard: getJsonFromCookie()['selectedCard'] || {},
+    boards: [],
+    teams: [],
+    cards: [],
   };
 };
 
@@ -71,40 +62,11 @@ export default new Vuex.Store({
     clearTeams(state) {
       state.page.teams = [];
     },
-    setSelectedTeamIdx(state, value) {
-      state.page.selectedTeamIdx = value;
+    setCards(state, value) {
+      state.page.cards = value;
     },
-    clearSelectedTeamIdx(state) {
-      state.page.selectedTeamIdx = 0;
-    },
-    setSelectedTeam(state, obj) {
-      state.page.selectedTeam = obj;
-    },
-    clearSelectedTeam(state) {
-      state.page.selectedTeam = {};
-    },
-    setInit(state, bool) {
-      state.page.init = bool;
-    },
-    setSelectedBoardIdx(state, int) {
-      state.page.selectedBoardIdx = int;
-    },
-    clearSelectedBoardIdx(state) {
-      state.page.selectedBoardIdx = -1;
-    },
-    setSelectedBoard(state, obj) {
-      state.page.selectedBoard = obj;
-    },
-    clearSelectedBoard(state) {
-      state.page.selectedBoard = {};
-    },
-  },
-  getters: {
-    isLogin(state) {
-      return state.email !== '';
-    },
-    selectedTeam(state) {
-      return state.page.selectedTeam;
+    clearCards(state) {
+      state.page.cards = [];
     },
   },
   actions: {
@@ -120,10 +82,6 @@ export default new Vuex.Store({
       saveAuthToCookie(response.data);
       saveUserEmailToCookie(userData.email);
 
-      // 페이지 초기화 해야하는 상태로 setting
-      commit('setInit', true);
-      saveJsonToCookie('init', true);
-
       return response;
     },
     logout({ commit }) {
@@ -132,107 +90,49 @@ export default new Vuex.Store({
 
       deleteCookie('til_auth');
       deleteCookie('til_user');
-      deleteCookie('til_page');
     },
     /* 필요한 값을 페이지 정보의 특정 키워드로 저장 해둡니다. */
     setTeams({ commit }, list) {
       commit('setTeams', list || []);
-      saveJsonToCookie('teams', list);
     },
     setBoards({ commit }, list) {
       commit('setBoards', list || []);
-      saveJsonToCookie('boards', list);
     },
-    setSelectedTeamIdx({ commit }, int) {
-      commit('setSelectedTeamIdx', int);
-      saveJsonToCookie('selectedTeamIdx', int);
+    setCards({ commit }, list) {
+      commit('setCards', list || []);
     },
-    setSelectedTeam({ commit }, obj) {
-      commit('setSelectedTeam', obj || {});
-      saveJsonToCookie('selectedTeam', obj);
-    },
-    setSelectedBoardIdx({ commit }, int) {
-      commit('setSelectedBoardIdx', int);
-      saveJsonToCookie('selectedBoardIdx', int);
-    },
-    setSelectedBoard({ commit }, obj) {
-      commit('setSelectedBoard', obj || {});
-      saveJsonToCookie('selectedBoard', obj);
-    },
-    initComplete({ commit }) {
-      commit('setInit', false);
-      saveJsonToCookie('init', false);
-    },
-    init({ commit }) {
-      commit('setInit', false);
-      commit('setTeams', []);
-      commit('setBoards', []);
-      commit('setSelectedTeamIdx', 0);
-      commit('setSelectedTeam', {});
-      commit('setSelectedBoardIdx', -1);
-      commit('setSelectedBoard', {});
-
-      const initConfig = {
-        init: false,
-        teams: [],
-        boards: [],
-        selectedTeamIdx: 0,
-        selectedTeam: {},
-        selectedBoardIdx: -1,
-        selectedBoard: {},
-      };
-
-      savewholeJsonToCookie(initConfig);
-    },
-    async refreshTeamAndBoard(context) {
-      let teams = this.state.page.teams;
-      let boards = this.state.page.boards;
-
-      let selectedTeamIdx = this.state.page.selectedTeamIdx;
-      let selectedTeam = teams[selectedTeamIdx];
-
-      let selectedBoardIdx = this.state.page.selectedBoardIdx;
-      let selectedBoard = {};
-      if (selectedBoardIdx != -1) selectedBoard = boards[selectedBoardIdx];
-
-      context.commit('setSelectedTeam', selectedTeam);
-      context.commit('setSelectedTeamIdx', selectedTeamIdx);
-      context.commit('setSelectedBoard', selectedBoard);
-      context.commit('setSelectedBoardIdx', selectedBoardIdx);
-    },
-    async refreshSetting(context) {
+    async refreshTeamsAndEmptyOther(context) {
       let teams = (await getTeams()).data;
 
-      if (teams.length > 0) {
-        let selectedTeamIdx = this.state.page.selectedTeamIdx;
-        let selectedTeam = teams[selectedTeamIdx];
+      context.commit('setTeams', teams);
+      context.commit('clearBoards');
+      context.commit('clearCards');
+    },
+    async refreshOnlyBoards(context, teamId) {
+      let boards = (await getBoards(teamId)).data;
 
-        let boards = (await getBoards(selectedTeam.id)).data;
-        let selectedBoardIdx = this.state.page.selectedBoardIdx;
-        let selectedBoard = {};
-        if (selectedBoardIdx != -1) selectedBoard = boards[selectedBoardIdx];
+      console.log(boards);
+      context.commit('setBoards', boards);
+    },
+    async refreshOnlyCards(context, boardId) {
+      let cards = (await getCards(boardId)).data;
 
-        context.commit('setInit', true);
+      console.log(cards);
+      context.commit('setCards', cards);
+    },
+    async refreshOnlyTeams(context) {
+      let teams = (await getTeams()).data;
+
+      context.commit('setTeams', teams);
+    },
+    async refreshSetting(context, teamId) {
+      let teams = (await getTeams()).data;
+
+      if (this.$isNotEmpty(teamId)) {
+        let boards = (await getBoards(teamId)).data;
+
         context.commit('setTeams', teams);
-        context.commit('setSelectedTeam', selectedTeam);
-        context.commit('setSelectedTeamIdx', selectedTeamIdx);
         context.commit('setBoards', boards);
-        context.commit('setSelectedBoard', selectedBoard);
-        context.commit('setSelectedBoardIdx', selectedBoardIdx);
-
-        const initConfig = {
-          init: false,
-          teams: teams,
-          boards: boards,
-          selectedTeamIdx: selectedTeamIdx,
-          selectedTeam: selectedTeam,
-          selectedBoardIdx: selectedBoardIdx,
-          selectedBoard: selectedBoard,
-        };
-
-        savewholeJsonToCookie(initConfig);
-      } else {
-        await context.dispatch('init', context);
       }
     },
   },

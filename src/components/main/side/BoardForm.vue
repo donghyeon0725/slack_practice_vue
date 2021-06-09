@@ -43,13 +43,6 @@
         <b-button size="sm" variant="danger" @click="cancel()"> 취소 </b-button>
       </template>
     </b-modal>
-
-    <b-modal :id="'BoardResultModal-' + id" cancel-only
-      >{{ resContent }}
-      <template #modal-footer="{ cancel }">
-        <b-button size="sm" variant="danger" @click="cancel()"> 닫기 </b-button>
-      </template>
-    </b-modal>
   </div>
 </template>
 
@@ -71,7 +64,6 @@ export default {
         content: '',
         teamId: '',
       },
-      resContent: '',
     };
   },
   methods: {
@@ -84,25 +76,30 @@ export default {
       this.form.content = '';
     },
     async createBoard() {
+      let msg = '';
       try {
-        this.form.teamId = this.$store.getters.selectedTeam.id;
-        this.resContent = '보드가 생성 되었습니다.';
-        let result = await createBoard(this.form);
-        console.log(result);
+        msg = '보드가 생성 되었습니다.';
+        let { data } = await createBoard(this.form);
+
+        this.$defualtToast(msg);
+        let teamId = this.$route.params.teamId;
+
+        await this.$store.dispatch('refreshOnlyBoards', teamId);
+        await this.$router.push('/main/' + teamId + '/' + data.id);
       } catch (e) {
+        console.log(e);
         if (e.response.status == 409) {
-          this.resContent = '이미 보드를 생성하셨습니다.';
+          msg = '이미 보드를 생성하셨습니다.';
         }
+        this.$defualtToast(msg, { type: 'warning' });
       }
-
-      await this.$bvModal.show('BoardResultModal-' + this.id);
-
-      await this.$store.dispatch('refreshSetting');
     },
   },
   mounted() {
-    this.$root.$on('bv::modal::show', () => {
-      this.onReset();
+    this.$root.$on('bv::modal::show', (evt, mId) => {
+      if (mId == this.id) this.onReset();
+
+      this.form.teamId = this.$route.params.teamId;
     });
   },
 };

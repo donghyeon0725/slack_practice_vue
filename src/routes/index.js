@@ -24,6 +24,13 @@ const router = new VueRouter({
       meta: {
         auth: true,
       },
+    },
+    {
+      path: '/main/:teamId',
+      component: () => import('@/views/MainPage.vue'),
+      meta: {
+        auth: true,
+      },
       children: [
         {
           path: ':boardId',
@@ -51,13 +58,13 @@ const router = new VueRouter({
 // 라우터 가드
 router.beforeEach((to, from, next) => {
   // 로그인 상태일 때는 다시 로그인 페이지레 들어갈 수 없음
-  if (to.path == '/login' && store.getters.isLogin) {
+  if (to.path == '/login' && store.state.email != '') {
     next('/main');
     return;
   }
 
   // 로그인이 필요한 페이지인데, 로그인 상태가 아니면 로그인 페이지로 보낸다.
-  if (to.meta.auth && !store.getters.isLogin) {
+  if (to.meta.auth && store.state.email == '') {
     console.log('인증이 필요합니다');
     // login 페이지로
     next('/login');

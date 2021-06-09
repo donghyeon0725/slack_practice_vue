@@ -12,4 +12,14 @@ function createBoard(boardData) {
   return instance.post('board', boardData);
 }
 
-export { getBoards, createBoard };
+// 보드 수정
+function modifyBoard(boardData) {
+  return instance.patch('board', boardData);
+}
+
+// 보드 삭제
+function deleteBoard(id) {
+  return instance.delete(`board/${id}`);
+}
+
+export { getBoards, createBoard, modifyBoard, deleteBoard };

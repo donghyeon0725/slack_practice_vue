@@ -11,11 +11,13 @@
         style="width: 100%"
         :key="'dropdown' + board_idx"
         v-for="(board, board_idx) in boards"
-        @click="changeActivatedBoard(board_idx)"
       >
-        <b-nav-item :to="{ path: '/main/' + board_idx }">{{
-          board.title
-        }}</b-nav-item></b-dropdown-item
+        <b-nav-item
+          :to="{
+            path: '/main/' + teamId + '/' + board.id,
+          }"
+          >{{ board.title }}</b-nav-item
+        ></b-dropdown-item
       >
       <!--<b-dropdown-divider></b-dropdown-divider>-->
     </b-nav-item-dropdown>
@@ -23,10 +25,16 @@
 </template>
 
 <script>
-// import { getBoards } from '@/api/board';
+import { getBoards } from '@/api/board';
 
 export default {
   name: 'Board',
+  data() {
+    return {
+      // 이 컴포넌트의 teamId가 변경 될 때
+      teamId: '',
+    };
+  },
   props: {
     isActived: {
       type: Boolean,
@@ -34,23 +42,39 @@ export default {
     },
   },
   methods: {
-    async changeActivatedBoard(board_idx) {
-      await this.$store.dispatch('setSelectedBoardIdx', Number(board_idx));
-      await this.$store.dispatch('refreshTeamAndBoard');
+    async getBoards() {
+      // boards 초기화
+      if (this.isActived) {
+        this.teamId = this.$route.params.teamId;
 
-      /*try {
-        const { data } = await getCard(boards[selectedIdx].id);
-        await this.$store.dispatch('setCard', data);
-      } catch (e) {
-        console.log(e);
-      }*/
+        try {
+          let teamId = this.$route.params.teamId;
+          let { data } = await getBoards(teamId);
+          await this.$store.dispatch('setBoards', data);
+        } catch (e) {
+          console.log(e);
+        }
+      }
+    },
+  },
+  watch: {
+    // prop을 watch 하려면 deep 모드를 켜야한다.
+    isActived: {
+      immediate: true,
+      deep: true,
+      handler() {
+        // state의 값을 변화 시키기
+        this.getBoards();
+      },
     },
   },
   computed: {
     team: {
       get() {
-        /* state.selectedTeam에 변화가 일어나면 active 된 보드의 team을 사용하는 관련 컴포넌트가 자동 랜더링 됨 */
-        if (this.isActived) return this.$store.state.page.selectedTeam;
+        if (this.isActived)
+          return this.$store.state.page.teams.filter(
+            s => s.id == this.$route.params.teamId,
+          )[0];
 
         return {};
       },
@@ -60,20 +84,22 @@ export default {
     },
     boards: {
       get() {
-        /* state.selectedTeam에 변화가 일어나면 active 된 보드의, 에 변화가 일어나면 재계산 될값 */
-        if (this.isActived) return this.$store.state.page.boards;
-
-        return {};
+        return this.$store.state.page.boards;
       },
-      set(list) {
-        this.$store.commit('setBoards', list);
+      set(obj) {
+        this.$store.commit('setBoards', obj);
       },
     },
     selectedBoard: {
       get() {
         if (this.isActived) {
-          let selectedBoard = this.$store.state.page.selectedBoard;
-          if (Object.keys(selectedBoard).length != 0) return selectedBoard;
+          let boardId = this.$route.params.boardId;
+          if (this.$isNotEmpty(boardId)) {
+            let selectedBoard = this.$store.state.page.boards.filter(
+              s => s.id == boardId,
+            )[0];
+            if (Object.keys(selectedBoard).length != 0) return selectedBoard;
+          }
         }
 
         return { title: '보드를 선택하세요.' };

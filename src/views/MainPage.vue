@@ -1,38 +1,51 @@
 <template>
-  <div class="container p-0 m-0" style="height: 100vh">
-    <Spinner v-if="loading"></Spinner>
-    <div class="side me-2" style="background: #f7f6f3">
-      <TeamList></TeamList>
+  <div class="c-container">
+    <div class="side">
+      <Side></Side>
     </div>
     <div class="center">
-      <router-view></router-view>
+      <router-view :key="$route.fullPath"></router-view>
     </div>
   </div>
 </template>
 
 <script>
-import Spinner from '@/components/common/Spinner';
-import TeamList from '@/components/main/Team';
+import Side from '@/views/MainSidePage';
 
 export default {
   name: 'MainPage',
-  components: { Spinner, TeamList },
+  components: { Side },
   data() {
     return {
       loading: false, // true로 변경해서 확인해보세요.
     };
   },
+  async created() {},
 };
 </script>
 
 <style>
-.container {
-  margin: 20px 0 0 0;
+.c-container {
+  height: 100vh;
   padding: 0;
   display: flex;
+  margin: 0;
+  padding: 0;
+  width: 100%;
+  overflow-x: hidden;
+  box-sizing: border-box;
 }
 
 .side {
-  flex-basis: 400px;
+  background: #f7f6f3;
+  flex-basis: 500px;
+  position: relative;
+  /* fixed child 요소를 포함하기 위해서는 아래와 같은 속성이 필요합니다. */
+  transform: translate3d(0, 0, 0);
+}
+
+.center {
+  width: 100%;
+  overflow: scroll;
 }
 </style>

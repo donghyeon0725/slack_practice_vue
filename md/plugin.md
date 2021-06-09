@@ -59,10 +59,10 @@ let modal = {
     // 별도 사용할 설정이 있는 경우
     Object.assign(config, options);
 
-    // bootstrap 플러그인에서 꺼내 옵니다.
-    this.$bvModal
+    let result = this.$bvModal
       .msgBoxConfirm(message, config)
       .then(value => {
+        // 다음 작업이 필요한 경우 사용
         if (value) return true;
         else return false;
       })
@@ -71,7 +71,8 @@ let modal = {
         console.log(err);
         return false;
       });
-    return false;
+    console.log(result);
+    return result;
   },
 };
 
@@ -164,9 +165,10 @@ let modal = {
   message: '보드를 삭제 하시 겠습니까?',
 };
 
-// eslint-disable-next-line no-undef
-if (this.$confirmModal(modal.title, modal.message)) {
-  console.log('모달을 호출 했습니다.');
+// 확인 모달 호출
+let confirm = await this.$confirmModal(modal.title, modal.message);
+if (confirm) {
+console.log('확인 누름');
 }
 ```
 

@@ -1,19 +1,14 @@
 <template>
   <div>
     <b-button
-      v-b-modal.modal-footer-sm
+      v-b-modal="modal_id"
       block
       variant="outline-dark"
       style="width: 100%"
       >팀 생성하기</b-button
     >
 
-    <b-modal
-      id="modal-footer-sm"
-      title="Team"
-      button-size="sm"
-      @ok="createTeam"
-    >
+    <b-modal :id="modal_id" title="Team" button-size="sm" @ok="createTeam">
       <template #modal-header="{}">
         <h5>Team</h5>
       </template>
@@ -51,16 +46,8 @@
       </b-form>
 
       <template #modal-footer="{ ok, cancel }">
-        <!-- Emulate built in modal footer ok and cancel button actions -->
         <b-button size="sm" variant="primary" @click="ok()">생성하기</b-button>
         <b-button size="sm" variant="danger" @click="cancel()"> 취소 </b-button>
-      </template>
-    </b-modal>
-
-    <b-modal id="TeamCreateResult" cancel-only
-      >{{ resContent }}
-      <template #modal-footer="{ cancel }">
-        <b-button size="sm" variant="danger" @click="cancel()"> 닫기 </b-button>
       </template>
     </b-modal>
   </div>
@@ -73,11 +60,11 @@ export default {
   name: 'TeamForm',
   data() {
     return {
+      modal_id: 'TeamCreateModal',
       form: {
         name: '',
         description: '',
       },
-      resContent: '',
     };
   },
   methods: {
@@ -90,30 +77,34 @@ export default {
       this.form.description = '';
     },
     async createTeam() {
+      let msg = '';
+
       try {
-        let result = await createTeam(this.form);
-        this.resContent = '팀이 생성 되었습니다.';
-        console.log(result);
+        let { data } = await createTeam(this.form);
+        msg = '팀이 생성 되었습니다.';
+
+        this.$defualtToast(msg);
+        await this.$store.dispatch('refreshTeamsAndEmptyOther');
+        await this.$router.push('/main/' + data.id);
       } catch (e) {
         if (
           Object.prototype.hasOwnProperty.call(e, 'response') &&
           e.response.status == 409
         ) {
-          this.resContent = '이미 팀을 생성하셨습니다.';
+          msg = '이미 팀을 생성하셨습니다.';
         } else {
-          this.resContent = '에러가 발생했습니다.';
+          msg = '에러가 발생했습니다.';
         }
+
+        this.$defualtToast(msg, { type: 'error' });
       }
-
-      // 결과창 모달 호출
-      await this.$root.$emit('bv::show::modal', 'TeamCreateResult');
-
-      await this.$store.dispatch('refreshSetting');
     },
   },
   mounted() {
-    this.$root.$on('bv::modal::show', () => {
-      this.onReset();
+    this.$root.$on('bv::modal::show', (evt, mId) => {
+      if (mId == this.modal_id) {
+        this.onReset();
+      }
     });
   },
 };
