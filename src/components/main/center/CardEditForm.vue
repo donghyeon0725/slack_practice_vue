@@ -1,5 +1,5 @@
 <template>
-  <b-modal :id="modal_id" v-model="isCardDetailActive" @ok="modifyCard">
+  <b-modal :id="modal_id" v-model="isCardModifyActive" @ok="modifyCard">
     <template #modal-header="{}">
       <h5>Card</h5>
     </template>
@@ -73,16 +73,18 @@ export default {
     };
   },
   computed: {
-    isCardDetailActive: {
+    isCardModifyActive: {
       get: function () {
         // 아이디가 있어야 하고, 취소 버튼을 누르지 않은 상태여야 한다. 또한 카드 목록에 있어야 한다.
         let cards = this.$store.state.page.cards;
         let cardId = this.$route.query.cardId;
+        let isDetailMode = this.$route.query.detail == 'true';
 
         if (cards.length <= 0) return false;
         if (this.$isEmpty(cardId)) return false;
 
-        if (cards.filter(s => s.id == cardId).length > 0) return true;
+        if (cards.filter(s => s.id == cardId).length > 0)
+          if (!isDetailMode) return true;
 
         return false;
       },

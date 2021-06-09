@@ -33,4 +33,22 @@ function modifyCard(cardJsonData) {
 function deleteCard(cardId) {
   return instance.delete(`card/${cardId}`);
 }
-export { getCards, createCard, modifyCard, deleteCard };
+
+// 댓글 생성하기
+function createReply(replyData) {
+  return instance.post('card/replies', replyData);
+}
+
+// 댓글 삭제
+function deleteReply(replyId) {
+  return instance.delete(`card/replies/${replyId}`);
+}
+
+export {
+  getCards,
+  createCard,
+  modifyCard,
+  deleteCard,
+  createReply,
+  deleteReply,
+};

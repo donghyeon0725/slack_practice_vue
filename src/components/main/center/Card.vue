@@ -5,14 +5,15 @@
         class="fit"
         :key="index"
         v-for="(card, index) in cards"
-        @click="showCard"
+        @click="showCard(card.id)"
         style="cursor: pointer"
       >
         <b-card
           :title="card.title"
           :img-src="
             card.attachments.length > 0
-              ? 'http://localhost:8081/getImage/' +
+              ? ref +
+                'getImage/' +
                 card.attachments[0].path
                   .replaceAll('\\', '@')
                   .replaceAll('/', '@') +
@@ -42,7 +43,7 @@
               @click="stopPropagation"
               :to="{
                 path: '/main/' + teamId + '/' + boardId,
-                query: { cardId: card.id },
+                query: { cardId: card.id, detail: false },
               }"
               variant="outline-primary"
               class="card-modify-btn"
@@ -76,6 +77,7 @@ export default {
     return {
       teamId: this.$route.params.teamId,
       boardId: this.$route.params.boardId,
+      ref: process.env.VUE_APP_API_URL,
     };
   },
   methods: {
@@ -83,8 +85,14 @@ export default {
     stopPropagation(event) {
       event.stopPropagation();
     },
-    showCard() {
-      console.log('모달을 보여주세요');
+    showCard(id) {
+      let teamId = this.$route.params.teamId;
+      let boardId = this.$route.params.boardId;
+
+      this.$router.push({
+        path: '/main/' + teamId + '/' + boardId,
+        query: { cardId: id, detail: true },
+      });
     },
     async deleteCard(cardId) {
       let modal = {
@@ -95,7 +103,6 @@ export default {
       // 확인 모달 호출
       let confirm = await this.$confirmModal(modal.title, modal.message);
       if (confirm) {
-        console.log(cardId);
         try {
           let { data } = await deleteCard(cardId);
           console.log(data);
@@ -128,8 +135,6 @@ export default {
     },
   },
   updated() {
-    console.log(document.querySelectorAll('button.card-delete-btn'));
-
     let deleteBtn = document.querySelectorAll('button.card-delete-btn');
     let modifyBtn = document.querySelectorAll('a.card-modify-btn');
 

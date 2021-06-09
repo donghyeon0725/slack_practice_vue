@@ -50,8 +50,11 @@
       <CardForm id="card-create-modal"></CardForm>
     </div>
 
+    <!-- 카드 수정하기 폼 -->
+    <CardEditForm></CardEditForm>
+
     <!-- 카드 상세보기 폼 -->
-    <CardEditForm :modal-show="true"></CardEditForm>
+    <CardDetailForm></CardDetailForm>
   </div>
 </template>
 
@@ -62,6 +65,7 @@ import { getCards } from '@/api/card';
 import Card from '@/components/main/center/Card';
 import CardForm from '@/components/main/center/CardForm';
 import CardEditForm from '@/components/main/center/CardEditForm';
+import CardDetailForm from '@/components/main/center/CardDetailForm';
 
 export default {
   name: 'BoardPage',
@@ -70,6 +74,7 @@ export default {
     Card,
     CardForm,
     CardEditForm,
+    CardDetailForm,
   },
   data() {
     return {
@@ -93,7 +98,7 @@ export default {
           this.$defualtToast('삭제 성공');
         } catch (e) {
           console.log(e);
-          this.$defualtToast('삭제 실패');
+          this.$defualtToast('삭제 실패', { type: 'error' });
         }
 
         await this.$store.dispatch('refreshTeamsAndEmptyOther');

@@ -117,7 +117,6 @@ export default new Vuex.Store({
     async refreshOnlyCards(context, boardId) {
       let cards = (await getCards(boardId)).data;
 
-      console.log(cards);
       context.commit('setCards', cards);
     },
     async refreshOnlyTeams(context) {
