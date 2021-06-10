@@ -35,6 +35,7 @@
 27. [X] [vue Filter 적용하기](./md/filter.md)
 28. [X] [전역 함수 등록 (플러그인 만들기)](./md/plugin.md)
 29. [X] [토스트 별도 사용](./md/toast.md)
+31. [X] [드래그 앤 드롭](md/dragAndDrop.md)
 
 # slack_practice_vue
 

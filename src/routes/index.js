@@ -49,6 +49,11 @@ const router = new VueRouter({
       component: () => import('@/views/JoinPage.vue'),
     },
     {
+      // 팀 초대 메일 수락 페이지
+      path: '/invite/:email/:token',
+      component: () => import('@/views/TeamJoinPage.vue'),
+    },
+    {
       path: '*',
       component: () => import('@/views/NotFountPage.vue'),
     },

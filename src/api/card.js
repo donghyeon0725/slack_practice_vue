@@ -44,6 +44,11 @@ function deleteReply(replyId) {
   return instance.delete(`card/replies/${replyId}`);
 }
 
+// 카드 위치 이동하기
+function updateCardPosition(cardDummy) {
+  return instance.patch('card/position', cardDummy);
+}
+
 export {
   getCards,
   createCard,
@@ -51,4 +56,5 @@ export {
   deleteCard,
   createReply,
   deleteReply,
+  updateCardPosition,
 };

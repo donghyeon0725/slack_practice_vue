@@ -10,7 +10,7 @@ import {
   // deleteJsonValueFromCookie,
 } from '@/util/cookie';
 import { login } from '@/api/auth';
-import { getTeams } from '@/api/team';
+import { getTeams, getTeamMember } from '@/api/team';
 import { getBoards } from '@/api/board';
 import { getCards } from '@/api/card';
 
@@ -25,6 +25,7 @@ const PAGE_DATA = () => {
     boards: [],
     teams: [],
     cards: [],
+    members: [],
   };
 };
 
@@ -50,23 +51,29 @@ export default new Vuex.Store({
     },
 
     /* 분리 */
-    setBoards(state, value) {
-      state.page.boards = value;
+    setBoards(state, list) {
+      state.page.boards = list;
     },
     clearBoards(state) {
       state.page.boards = [];
     },
-    setTeams(state, value) {
-      state.page.teams = value;
+    setTeams(state, list) {
+      state.page.teams = list;
     },
     clearTeams(state) {
       state.page.teams = [];
     },
-    setCards(state, value) {
-      state.page.cards = value;
+    setCards(state, list) {
+      state.page.cards = list;
     },
     clearCards(state) {
       state.page.cards = [];
+    },
+    setMembers(state, list) {
+      state.page.members = list;
+    },
+    clearMembers(state) {
+      state.page.members = [];
     },
   },
   actions: {
@@ -111,7 +118,6 @@ export default new Vuex.Store({
     async refreshOnlyBoards(context, teamId) {
       let boards = (await getBoards(teamId)).data;
 
-      console.log(boards);
       context.commit('setBoards', boards);
     },
     async refreshOnlyCards(context, boardId) {
@@ -123,6 +129,11 @@ export default new Vuex.Store({
       let teams = (await getTeams()).data;
 
       context.commit('setTeams', teams);
+    },
+    async refreshOnlyMembers(context, teamId) {
+      let members = (await getTeamMember(teamId)).data;
+
+      context.commit('setMembers', members);
     },
     async refreshSetting(context, teamId) {
       let teams = (await getTeams()).data;

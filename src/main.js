@@ -8,14 +8,13 @@ import globalPlugin from '@/global/index'; // global
 import { BootstrapVue, IconsPlugin } from 'bootstrap-vue';
 import 'bootstrap/dist/css/bootstrap.css';
 import 'bootstrap-vue/dist/bootstrap-vue.css';
-
-import VueToast from 'vue-toast-notification';
-import 'vue-toast-notification/dist/theme-sugar.css';
-// bootstrap 토스트 버그로 다른 라이브러리 사용
-Vue.use(VueToast);
-
 Vue.use(BootstrapVue);
 Vue.use(IconsPlugin);
+
+// bootstrap 토스트 버그로 다른 라이브러리 사용
+import VueToast from 'vue-toast-notification';
+import 'vue-toast-notification/dist/theme-sugar.css';
+Vue.use(VueToast);
 
 // global 함수
 Vue.use(globalPlugin);

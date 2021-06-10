@@ -1,86 +1,124 @@
 <template>
   <div>
     <div class="f-container">
-      <div
-        class="fit"
-        :key="index"
-        v-for="(card, index) in cards"
-        @click="showCard(card.id)"
-        style="cursor: pointer"
+      <!-- 드로그 앤 드롭 -->
+      <draggable
+        tag="ul"
+        v-model="cards"
+        :options="{ group: 'people' }"
+        @start="drag = true"
+        @end="drag = false"
+        :component-data="getComponentData()"
+        :draggable="hasAuthFormThisBoard ? '.card-content' : ''"
       >
-        <b-card
-          :title="card.title"
-          :img-src="
-            card.attachments.length > 0
-              ? ref +
-                'getImage/' +
-                card.attachments[0].path
-                  .replaceAll('\\', '@')
-                  .replaceAll('/', '@') +
-                '@' +
-                card.attachments[0].systemFilename
-                  .replaceAll('\\', '@')
-                  .replaceAll('/', '@')
-              : 'https://picsum.photos/600/300/?image=25'
-          "
-          img-alt="Image"
-          img-top
-          tag="article"
-          style="max-width: 20rem"
-          class="mb-2"
-        >
-          <b-card-text>
-            {{ card.content }}
-          </b-card-text>
+        <transition-group type="transition" :name="'flip-list'">
+          <li
+            class="fit card-content"
+            :key="card.position"
+            v-for="card in cards"
+            @click="showCard(card.id)"
+            style="cursor: pointer"
+          >
+            <b-card
+              :title="card.title"
+              :img-src="
+                card.attachments.length > 0
+                  ? ref +
+                    'getImage/' +
+                    card.attachments[0].path
+                      .replaceAll('\\', '@')
+                      .replaceAll('/', '@') +
+                    '@' +
+                    card.attachments[0].systemFilename
+                      .replaceAll('\\', '@')
+                      .replaceAll('/', '@')
+                  : 'https://picsum.photos/600/300/?image=25'
+              "
+              img-alt="Image"
+              img-top
+              tag="article"
+              style="max-width: 20rem"
+              class="mb-2"
+            >
+              <b-card-text>
+                {{ card.content }}
+              </b-card-text>
 
-          <div style="float: right">
-            <b-button
-              v-if="
-                isCardCreator(card.state) ||
-                isBoardCreator(card.state) ||
-                isTeamCreator(card.state)
-              "
-              @click="stopPropagation"
-              :to="{
-                path: '/main/' + teamId + '/' + boardId,
-                query: { cardId: card.id, detail: false },
-              }"
-              variant="outline-primary"
-              class="card-modify-btn"
-              >Modify</b-button
-            >
-            &nbsp;
-            <b-button
-              v-if="
-                isCardCreator(card.state) ||
-                isBoardCreator(card.state) ||
-                isTeamCreator(card.state)
-              "
-              class="card-delete-btn"
-              @click="stopPropagation, deleteCard(card.id)"
-              variant="outline-danger"
-              >Delete</b-button
-            >
-          </div>
-        </b-card>
-      </div>
+              <div style="float: right">
+                <b-button
+                  v-if="
+                    isCardCreator(card.state) ||
+                    isBoardCreator(card.state) ||
+                    isTeamCreator(card.state)
+                  "
+                  @click="stopPropagation"
+                  :to="{
+                    path: '/main/' + teamId + '/' + boardId,
+                    query: { cardId: card.id, detail: false },
+                  }"
+                  variant="outline-primary"
+                  class="card-modify-btn"
+                  >Modify</b-button
+                >
+                &nbsp;
+                <b-button
+                  v-if="
+                    isCardCreator(card.state) ||
+                    isBoardCreator(card.state) ||
+                    isTeamCreator(card.state)
+                  "
+                  class="card-delete-btn"
+                  @click="stopPropagation, deleteCard(card.id)"
+                  variant="outline-danger"
+                  >Delete</b-button
+                >
+              </div>
+            </b-card>
+          </li>
+        </transition-group>
+      </draggable>
     </div>
   </div>
 </template>
 
 <script>
-import { deleteCard } from '@/api/card';
+import { deleteCard, updateCardPosition } from '@/api/card';
+import Draggable from 'vuedraggable';
 
 export default {
   name: 'Card',
+  components: {
+    Draggable,
+  },
   data() {
     return {
       teamId: this.$route.params.teamId,
       boardId: this.$route.params.boardId,
       ref: process.env.VUE_APP_API_URL,
+      activeNames: '',
     };
   },
   methods: {
+    handleChange() {
+      console.log('변화 감지');
+    },
+    inputChanged(value) {
+      this.activeNames = value;
+    },
+    getComponentData() {
+      return {
+        on: {
+          change: this.handleChange,
+          input: this.inputChanged,
+        },
+        attrs: {
+          wrap: true,
+        },
+        props: {
+          value: this.activeNames,
+        },
+      };
+    },
     // 이벤트 버블링 방지
     stopPropagation(event) {
       event.stopPropagation();
@@ -129,9 +167,43 @@ export default {
     },
   },
   computed: {
+    hasAuthFormThisBoard() {
+      let board = this.$store.state.page.boards.filter(
+        s => s.id == this.$route.params.boardId,
+      )[0];
+
+      if (this.$isEmpty(board)) return false;
+      return board.state == 'CREATOR' || board.state == 'BOARD_CREATOR';
+    },
     // 기본적으로 store에서 불러온 card를 가지고 컴포넌트를 랜더링 하나, cards의 데이터를 변화시키는 시점은 이 컴포넌트가 활성화 되는 시점임(watch)
-    cards() {
-      return this.$store.state.page.cards;
+    cards: {
+      get() {
+        return this.$store.state.page.cards;
+      },
+      async set(cards) {
+        // 카드의 이동이 일어났을 때, 상태 데이터를 넣어 줍니다.
+        // 데이터의 순서 뿐 아니라, position 자체를 변경했을 경우, animation 효과가 아닌, 재 랜더링을 하기 때문에, position을 번경하지 않습니다.
+
+        let copy = [];
+        let position = 0;
+        for (let card of cards) {
+          let json = {};
+          json.id = card.id;
+          json.position = ++position;
+          copy.push(json);
+        }
+        // capy 본을 서버에 저장합니다.
+        try {
+          let { data } = await updateCardPosition({ cards: copy });
+          this.$defualtToast('위치 변경');
+          console.log(data);
+        } catch (e) {
+          console.log(e);
+          this.$defualtToast('실패', { type: 'error' });
+        }
+
+        this.$store.commit('setCards', cards);
+      },
     },
   },
   updated() {
@@ -160,7 +232,17 @@ export default {
   margin-right: 2vw;
   margin-bottom: 2vh;
 }
-.card {
-  min-width: 20rem;
+
+.flip-list-move {
+  transition: transform 0.5s;
+}
+
+.no-move {
+  transition: transform 0s;
+}
+
+.ghost {
+  opacity: 0.5;
+  background: #c8ebfb;
 }
 </style>

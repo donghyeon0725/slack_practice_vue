@@ -14,4 +14,8 @@ function isNotEmpty(value) {
   return !isEmpty(value);
 }
 
-export { validateEmail, isEmpty, isNotEmpty };
+function isLetter(str) {
+  return str.length === 1 && str.match(/[a-z]/i);
+}
+
+export { validateEmail, isEmpty, isNotEmpty, isLetter };

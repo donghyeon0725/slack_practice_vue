@@ -1,5 +1,5 @@
 <template>
-  <div>
+  <div style="padding: 5px">
     <b-button
       v-b-modal="modal_id"
       block

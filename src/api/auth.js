@@ -1,6 +1,7 @@
-import { getInstance } from '@/api/index';
+import { getInstance, getInstanceWithAuth } from '@/api/index';
 
 const ins = getInstance();
+const insWithAuth = getInstanceWithAuth();
 
 /**
  * 회원 가입 메일을 요청합니다.
@@ -34,4 +35,13 @@ function login(formData) {
   return ins.post('users/login', formData);
 }
 
-export { signupMail, join, login };
+/**
+ * 유저의 이메일 검색 (로그인 필요)
+ * @constructor
+ * @param {string} email 이 필요 합니다.
+ * */
+function getUserEmail(email) {
+  return insWithAuth.get(`users/${email}`);
+}
+
+export { signupMail, join, login, getUserEmail };
