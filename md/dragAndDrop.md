@@ -14,7 +14,7 @@
 
 📌 시연
 -
-![이미지](md/img/dragAndDrop_example.gif)
+![이미지](./img/dragAndDrop_example.gif)
 
 
 <br/>

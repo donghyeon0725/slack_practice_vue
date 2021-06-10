@@ -37,7 +37,10 @@
 29. [X] [토스트 별도 사용](./md/toast.md)
 31. [X] [드래그 앤 드롭](md/dragAndDrop.md)
 
-# slack_practice_vue
+# slack_practice_vue version
+-
+* 1.0.0 Version [2021-06-10]
+    * 이 버전은 [slack_practice](https://github.com/donghyeon0725/slack_practice) 의 Version 1.0.0 과 완전히 호환 됩니다.
 
 ## Project setup
 ```
