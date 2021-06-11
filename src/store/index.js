@@ -26,6 +26,7 @@ const PAGE_DATA = () => {
     teams: [],
     cards: [],
     members: [],
+    filterWord: '',
   };
 };
 
@@ -75,6 +76,12 @@ export default new Vuex.Store({
     clearMembers(state) {
       state.page.members = [];
     },
+    setFilterWord(state, string) {
+      state.page.filterWord = string;
+    },
+    clearFilterWord(state) {
+      state.page.filterWord = '';
+    },
   },
   actions: {
     async login({ commit }, userData) {
@@ -123,7 +130,10 @@ export default new Vuex.Store({
     async refreshOnlyCards(context, boardId) {
       let cards = (await getCards(boardId)).data;
 
+      console.log(cards);
+
       context.commit('setCards', cards);
+      context.commit('clearFilterWord');
     },
     async refreshOnlyTeams(context) {
       let teams = (await getTeams()).data;

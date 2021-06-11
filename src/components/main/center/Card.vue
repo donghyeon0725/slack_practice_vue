@@ -41,7 +41,7 @@
               class="mb-2"
             >
               <b-card-text>
-                {{ card.content }}
+                {{ card.content | cutTextAtStart(10) }}
               </b-card-text>
 
               <div style="float: right">
@@ -178,11 +178,30 @@ export default {
     // 기본적으로 store에서 불러온 card를 가지고 컴포넌트를 랜더링 하나, cards의 데이터를 변화시키는 시점은 이 컴포넌트가 활성화 되는 시점임(watch)
     cards: {
       get() {
+        let filterWord = this.$store.state.page.filterWord;
+
+        // 필터에 단어가 있는 경우
+        if (this.$isNotEmpty(filterWord)) {
+          // 드래깅 기능 꺼야함 => 예측 어려운 버그를 막기 위함
+          let cardList = document.querySelectorAll('.card-content');
+          for (let c of cardList) {
+            c.classList.remove('card-content');
+          }
+          return this.$store.state.page.cards.filter(s =>
+            new RegExp(filterWord, 'gi').test(s.title),
+          );
+        } else {
+          let cardList = document.querySelectorAll('.fit');
+          for (let c of cardList) {
+            c.classList.add('card-content');
+          }
+        }
+
         return this.$store.state.page.cards;
       },
       async set(cards) {
         // 카드의 이동이 일어났을 때, 상태 데이터를 넣어 줍니다.
-        // 데이터의 순서 뿐 아니라, position 자체를 변경했을 경우, animation 효과가 아닌, 재 랜더링을 하기 때문에, position을 번경하지 않습니다.
+        // 데이터의 순서 뿐 아니라, position 자체를 변경했을 경우, animation 효과가 아닌, 재 랜더링을 하기 때문에, position을 번경하지 않았습니다.
 
         let copy = [];
         let position = 0;
@@ -195,6 +214,12 @@ export default {
         // capy 본을 서버에 저장합니다.
         try {
           let { data } = await updateCardPosition({ cards: copy });
+
+          // position 데이터를 변경해줍니다. 이때, 데이터의 인덱스 순서는 변경이 일어나지 않도록 합니다.
+          // for (let d of data)
+          //   for (let card of this.$store.state.page.cards)
+          //     if (card.id == d.id) card.position = d.position;
+
           this.$defualtToast('위치 변경');
           console.log(data);
         } catch (e) {

@@ -27,13 +27,30 @@
           label-for="input-2"
           class="mb-2"
         >
-          <b-form-input
-            id="input-2"
+          <!-- 마크다운 -->
+          <b-form-textarea
+            id="CardCreateModalContent"
             v-model="form.content"
             placeholder="Card Description"
-            autocomplete="off"
+            rows="10"
+            max-rows="10"
+            @focus="lookMarkdown"
+            @blur="blindMarkdown"
             required
-          ></b-form-input>
+          ></b-form-textarea>
+          <Markdown
+            :mdText="form.content"
+            :visible="isMarkdownShow"
+            :option="{
+              width: '500px',
+              height: '400px',
+              left: '505px',
+              top: '50px',
+              container: {
+                padding: '30px 30px',
+              },
+            }"
+          ></Markdown>
         </b-form-group>
 
         <!-- file input -->
@@ -55,8 +72,10 @@
 
       <template #modal-footer="{ ok, cancel }">
         <!-- Emulate built in modal footer ok and cancel button actions -->
-        <b-button size="sm" variant="primary" @click="ok()">생성하기</b-button>
-        <b-button size="sm" variant="danger" @click="cancel()"> 취소 </b-button>
+        <b-button size="sm" variant="primary" @click="ok()">create</b-button>
+        <b-button size="sm" variant="danger" @click="cancel()">
+          cancel
+        </b-button>
       </template>
     </b-modal>
   </div>
@@ -64,9 +83,13 @@
 
 <script>
 import { createCard } from '@/api/card';
+import Markdown from '@/components/common/Markdown';
 
 export default {
   name: 'CardForm',
+  components: {
+    Markdown,
+  },
   props: {
     id: {
       type: String,
@@ -75,6 +98,7 @@ export default {
   },
   data() {
     return {
+      markdown: false,
       form: {
         title: '',
         content: '',
@@ -83,10 +107,18 @@ export default {
       },
     };
   },
+  computed: {
+    isMarkdownShow() {
+      return this.markdown;
+    },
+  },
   methods: {
-    onSubmit(event) {
-      event.preventDefault();
-      alert(JSON.stringify(this.form));
+    // 마크다운을 보여주고 끕니다.
+    lookMarkdown() {
+      this.markdown = true;
+    },
+    blindMarkdown() {
+      this.markdown = false;
     },
     onReset() {
       this.form.title = '';
@@ -163,7 +195,7 @@ export default {
   z-index: 3;
   display: block;
   height: calc(1.6em + 0.75rem);
-  content: '파일선택';
+  content: 'select file';
   background-color: #e9ecef;
   border-left: inherit;
   border-radius: 0 0.25rem 0.25rem 0;

@@ -1,24 +1,26 @@
 <template>
   <div class="card-container">
     <div class="cover">
-      <b-img
-        src="https://mblogthumb-phinf.pstatic.net/MjAxOTAzMDZfMTM3/MDAxNTUxODE0NTI0NDkz.RvXlYv6p5xPwXrOIPfABgFuiknuTn0iFZNuUguVYc_og.ii04J6D96C6FKQSXQzy9DABBNk7vNuU343nmAquhmZgg.JPEG.mong728/%25EC%25B4%2588%25EA%25B3%25A0%25ED%2599%2594%25EC%25A7%2588_%25EC%25BB%25B4%25ED%2593%25A8%25ED%2584%25B0_%25EB%25B0%25B0%25EA%25B2%25BD%25ED%2599%2594%25EB%25A9%25B4_(7).jpg?type=w800"
-        fluid
-        alt="Fluid image"
-      ></b-img>
+      <!-- 배너 컴포넌트 -->
+      <BoardBanner
+        :path="board.bannerPath"
+        :auth="isBoardCreator || isTeamCreator"
+      ></BoardBanner>
 
+      <!-- 보드 관련 기능 -->
       <b-button-group class="btn-group">
         <b-button
           variant="light"
           v-if="isBoardCreator"
           v-b-modal="'board_modify_form'"
-          >보드 수정하기</b-button
+          @click="stopPropagation"
+          >Modify Board</b-button
         >
         <b-button
           variant="light"
           v-if="isTeamCreator || isBoardCreator"
           @click="deleteBoard"
-          >보드 삭제하기</b-button
+          >Delete Board</b-button
         >
       </b-button-group>
     </div>
@@ -34,11 +36,21 @@
 
         <div class="t-right">
           <div class="top">
+            <!-- 검색 기능 -->
+            <div class="search-input">
+              <b-form-input
+                v-model="searchText"
+                id="filtering-input"
+                placeholder="📌 Search"
+                maxlength="15"
+              ></b-form-input>
+            </div>
+            <!-- 초대 버튼-->
             <b-button
               variant="light"
               v-if="isTeamCreator || isBoardCreator"
               v-b-modal="'invite_modal'"
-              >초대</b-button
+              >Invite</b-button
             >
             <b-modal
               id="invite_modal"
@@ -55,6 +67,7 @@
                 autocomplete="off"
                 required
               ></b-form-input>
+              <!-- 모달의 email input과 연결된 자동완성 창 => 부트스트랩에서 제공하는 게 없어서 개발함 -->
               <AutoComplete
                 v-on:update="choice"
                 :list="searchEmailList"
@@ -64,7 +77,9 @@
               ></AutoComplete>
             </b-modal>
           </div>
+
           <div class="bottom">
+            <!-- 팀에 합류된 사람 리스트-->
             <div
               class="icon-cover"
               :key="index"
@@ -81,6 +96,7 @@
       <!-- 보드 수정 폼 -->
       <BoardEditForm id="board_modify_form"></BoardEditForm>
 
+      <!-- 카드 리스트 -->
       <div class="cards">
         <Card></Card>
       </div>
@@ -119,6 +135,7 @@ import CardForm from '@/components/main/center/CardForm';
 import CardEditForm from '@/components/main/center/CardEditForm';
 import CardDetailForm from '@/components/main/center/CardDetailForm';
 import AutoComplete from '@/components/common/AutoComplete';
+import BoardBanner from '@/components/main/center/BoardBanner';
 
 export default {
   name: 'BoardPage',
@@ -129,6 +146,7 @@ export default {
     CardEditForm,
     CardDetailForm,
     AutoComplete,
+    BoardBanner,
   },
   data() {
     return {
@@ -138,6 +156,8 @@ export default {
         init: false,
         list: [],
       },
+      searchText: '',
+      init: false,
     };
   },
   methods: {
@@ -166,7 +186,8 @@ export default {
         this.$defualtToast('에러', { type: 'error' });
       }
     },
-    async deleteBoard() {
+    async deleteBoard(event) {
+      this.stopPropagation(event);
       let modal = {
         title: '삭제',
         message: '보드를 삭제 하시 겠습니까?',
@@ -197,6 +218,14 @@ export default {
       this.inviteForm.email = '';
       this.inviteForm.list = [];
       this.inviteForm.init = false;
+    },
+    // 이벤트 버블링 방지
+    stopPropagation(event) {
+      event.stopPropagation();
+    },
+    // filtering 검색어를 달아줍니다.
+    setFilteringWord() {
+      this.$store.commit('setFilterWord', this.searchText);
     },
   },
   computed: {
@@ -250,6 +279,15 @@ export default {
     }
   },
   mounted() {
+    if (!this.init) {
+      // 검색 input 에 이벤트
+      let input = document.getElementById('filtering-input');
+      if (this.$isNotEmpty(input))
+        input.addEventListener('keyup', this.setFilteringWord);
+
+      this.init = !this.init;
+    }
+
     this.$root.$on('bv::modal::show', (bvEvent, modalId) => {
       if (modalId == 'invite_modal') this.resetInviteForm();
     });
@@ -339,17 +377,41 @@ export default {
   flex-basis: 40vw;
 }
 .t-right {
-  flex-basis: 15vw;
+  flex-basis: 17vw;
   overflow: hidden;
   display: flex;
   flex-direction: column;
 }
+
 .t-right .top {
   flex-basis: 40px;
+  display: flex;
+  justify-content: space-between;
 }
 
-.t-right .top > button {
-  float: right;
+.t-right .search-input {
+  margin-right: 10px;
+}
+
+.search-input {
+  border: 1px solid #ffffff;
+  border-radius: 5px;
+  transition: all 0.7s cubic-bezier(0.1, -0.6, 0.2, 0) 0s;
+}
+
+.search-input:hover {
+  border-color: #ced4da;
+}
+
+.search-input input {
+  clear: none;
+  border: 1px none;
+  float: none;
+  background-color: #ffffff;
+}
+
+.t-right button {
+  white-space: nowrap;
 }
 
 .t-right .bottom {

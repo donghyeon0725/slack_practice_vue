@@ -40,8 +40,10 @@
       </b-form>
 
       <template #modal-footer="{ ok, cancel }">
-        <b-button size="sm" variant="primary" @click="ok()">수정하기</b-button>
-        <b-button size="sm" variant="danger" @click="cancel()"> 취소 </b-button>
+        <b-button size="sm" variant="primary" @click="ok()">update</b-button>
+        <b-button size="sm" variant="danger" @click="cancel()">
+          cancel
+        </b-button>
       </template>
     </b-modal>
   </span>

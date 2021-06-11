@@ -36,7 +36,7 @@
 28. [X] [전역 함수 등록 (플러그인 만들기)](./md/plugin.md)
 29. [X] [토스트 별도 사용](./md/toast.md)
 31. [X] [드래그 앤 드롭](md/dragAndDrop.md)
-
+32. [X] [마크다운](md/markdown.md)
 # slack_practice_vue version
 -
 * 1.0.0 Version [2021-06-10]

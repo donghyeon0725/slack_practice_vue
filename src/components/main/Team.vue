@@ -55,7 +55,7 @@
               block
               variant="outline-dark"
               style="width: 100%"
-              >보드 생성하기</b-button
+              >Create Board</b-button
             >
             <BoardForm :id="'board_modal-' + team_idx"></BoardForm>
           </b-card-text>

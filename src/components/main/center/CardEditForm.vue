@@ -7,7 +7,7 @@
     <b-form>
       <b-form-group id="input-group-1" label="Card Title:" label-for="input-1">
         <b-form-input
-          id="input-1"
+          id="CardEditModalInput"
           v-model="form.title"
           type="text"
           placeholder="Enter Card Title"
@@ -22,13 +22,30 @@
         label-for="input-2"
         class="mb-2"
       >
-        <b-form-input
-          id="input-2"
+        <!-- 마크다운 -->
+        <b-form-textarea
+          id="CardEditModalContent"
           v-model="form.content"
           placeholder="Card Description"
-          autocomplete="off"
+          rows="10"
+          max-rows="10"
+          @focus="lookMarkdown"
+          @blur="blindMarkdown"
           required
-        ></b-form-input>
+        ></b-form-textarea>
+        <Markdown
+          :mdText="form.content"
+          :visible="isMarkdownShow"
+          :option="{
+            width: '500px',
+            height: '400px',
+            left: '505px',
+            top: '50px',
+            container: {
+              padding: '30px 30px',
+            },
+          }"
+        ></Markdown>
       </b-form-group>
 
       <!-- file input -->
@@ -50,17 +67,21 @@
 
     <template #modal-footer="{ ok, cancel }">
       <!-- Emulate built in modal footer ok and cancel button actions -->
-      <b-button size="sm" variant="primary" @click="ok()">생성하기</b-button>
-      <b-button size="sm" variant="danger" @click="cancel()"> 취소 </b-button>
+      <b-button size="sm" variant="primary" @click="ok()">update</b-button>
+      <b-button size="sm" variant="danger" @click="cancel()"> cancel </b-button>
     </template>
   </b-modal>
 </template>
 
 <script>
 import { modifyCard } from '@/api/card';
+import Markdown from '@/components/common/Markdown';
 
 export default {
   name: 'CardEditForm',
+  components: {
+    Markdown,
+  },
   data() {
     return {
       modal_id: 'cardEditForm',
@@ -70,6 +91,7 @@ export default {
         content: '',
         file: null,
       },
+      markdown: false,
     };
   },
   computed: {
@@ -94,8 +116,18 @@ export default {
         }
       },
     },
+    isMarkdownShow() {
+      return this.markdown;
+    },
   },
   methods: {
+    // 마크다운을 보여줍니다.
+    lookMarkdown() {
+      this.markdown = true;
+    },
+    blindMarkdown() {
+      this.markdown = false;
+    },
     async modifyCard() {
       if (Array.isArray(this.form.file)) {
         this.form.file = this.form.file[0];

@@ -1,7 +1,7 @@
 import { getInstanceWithAuth, getInstance } from '@/api/index';
 
 const instance = getInstanceWithAuth();
-const instanceWithNoAuth = getInstance();
+const instanceNoAuth = getInstance();
 
 // 팀 리스트 요청
 function getTeams() {
@@ -30,7 +30,7 @@ function inviteTeam(teamId, email) {
 
 // 팀 초대 수락하기
 function acceptInvite(email, token) {
-  return instanceWithNoAuth.patch(
+  return instanceNoAuth.patch(
     'teams/join',
     { email: email },
     {

@@ -22,4 +22,15 @@ function deleteBoard(id) {
   return instance.delete(`board/${id}`);
 }
 
-export { getBoards, createBoard, modifyBoard, deleteBoard };
+// 배너 수정
+function updateBoardBanner(boardJsonData) {
+  let form_data = new FormData();
+
+  for (let key in boardJsonData) {
+    form_data.append(key, boardJsonData[key]);
+  }
+
+  return instance.patch('board/banner', form_data);
+}
+
+export { getBoards, createBoard, modifyBoard, deleteBoard, updateBoardBanner };

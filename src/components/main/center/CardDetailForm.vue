@@ -63,9 +63,23 @@
         <div class="content">
           <div class="title">{{ card.title }}</div>
           <div class="description">
-            <b-icon icon="info" class="icon"></b-icon>
-
-            {{ card.content }}
+            <Markdown
+              :mdText="card.content"
+              :visible="true"
+              :option="{
+                display: 'block',
+                width: '100%',
+                left: '505px',
+                top: '50px',
+                height: '100%',
+                position: 'static',
+                opacity: 1,
+                backgroundColor: 'rgba(244,252,255,0.5)',
+                container: {
+                  padding: '20px 30px',
+                },
+              }"
+            ></Markdown>
           </div>
         </div>
         <div class="line"></div>
@@ -111,9 +125,13 @@
 
 <script>
 import { createReply, deleteReply } from '@/api/card';
+import Markdown from '@/components/common/Markdown';
 
 export default {
   name: 'CardDetailForm',
+  components: {
+    Markdown,
+  },
   data() {
     return {
       modal_id: 'cardDetailForm',
@@ -232,7 +250,21 @@ export default {
 <style>
 #cardDetailForm .modal-body {
   height: 90vh;
+  overflow-y: auto;
+  scroll-bar: 10px;
 }
+
+.modal-body::-webkit-scrollbar {
+  width: 10px;
+}
+
+.modal-body::-webkit-scrollbar-thumb {
+  background-color: #afafaf;
+}
+.modal-body::-webkit-scrollbar-track {
+  background-color: #ced4da;
+}
+
 .replies label {
   padding-bottom: 5px;
 }

@@ -39,8 +39,10 @@
 
       <template #modal-footer="{ ok, cancel }">
         <!-- Emulate built in modal footer ok and cancel button actions -->
-        <b-button size="sm" variant="primary" @click="ok()">생성하기</b-button>
-        <b-button size="sm" variant="danger" @click="cancel()"> 취소 </b-button>
+        <b-button size="sm" variant="primary" @click="ok()">create</b-button>
+        <b-button size="sm" variant="danger" @click="cancel()">
+          cancle
+        </b-button>
       </template>
     </b-modal>
   </div>
