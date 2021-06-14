@@ -13,7 +13,9 @@
       >
         <transition-group type="transition" :name="'flip-list'">
           <li
-            class="fit card-content"
+            :class="
+              card.isSelected ? 'fit card-content selected' : 'fit card-content'
+            "
             :key="card.position"
             v-for="card in cards"
             @click="showCard(card.id)"
@@ -21,18 +23,63 @@
           >
             <b-card
               :title="card.title"
+              v-if="card.attachments == null"
+              :img-src="'https://picsum.photos/600/300/?image=25'"
+              img-alt="Image"
+              img-top
+              tag="article"
+              style="max-width: 20rem"
+              class="mb-2"
+            >
+              <b-card-text>
+                {{ card.content | cutTextAtStart(10) }}
+              </b-card-text>
+
+              <div style="float: right">
+                <b-button
+                  v-if="
+                    isCardCreator(card.state) ||
+                    isBoardCreator(card.state) ||
+                    isTeamCreator(card.state)
+                  "
+                  @click="stopPropagation"
+                  :to="{
+                    path: '/main/' + teamId + '/' + boardId,
+                    query: { cardId: card.id, detail: false },
+                  }"
+                  variant="outline-primary"
+                  class="card-modify-btn"
+                  >Modify</b-button
+                >
+                &nbsp;
+                <b-button
+                  v-if="
+                    isCardCreator(card.state) ||
+                    isBoardCreator(card.state) ||
+                    isTeamCreator(card.state)
+                  "
+                  class="card-delete-btn"
+                  @click="stopPropagation, deleteCard(card.id)"
+                  variant="outline-danger"
+                  >Delete</b-button
+                >
+              </div>
+            </b-card>
+
+            <!-- 널이 아닐 때 -->
+            <b-card
+              :title="card.title"
+              v-else-if="card.attachments.length > 0"
               :img-src="
-                card.attachments.length > 0
-                  ? ref +
-                    'getImage/' +
-                    card.attachments[0].path
-                      .replaceAll('\\', '@')
-                      .replaceAll('/', '@') +
-                    '@' +
-                    card.attachments[0].systemFilename
-                      .replaceAll('\\', '@')
-                      .replaceAll('/', '@')
-                  : 'https://picsum.photos/600/300/?image=25'
+                ref +
+                'getImage/' +
+                card.attachments[0].path
+                  .replaceAll('\\', '@')
+                  .replaceAll('/', '@') +
+                '@' +
+                card.attachments[0].systemFilename
+                  .replaceAll('\\', '@')
+                  .replaceAll('/', '@')
               "
               img-alt="Image"
               img-top

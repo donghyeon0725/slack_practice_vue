@@ -233,7 +233,7 @@ export default {
       this.form.content = '';
     },
   },
-  updated() {
+  async updated() {
     if (!this.init) {
       // textarea 의 enter를 전송 처리로 바꾸고, crtl + enter을 new line 처리로 바꿉니다.
       let textarea = document.getElementById('reply-textarea');

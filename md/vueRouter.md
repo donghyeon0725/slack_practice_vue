@@ -222,5 +222,30 @@ await this.$router.push('/페이지');
 <br/>
 
 
+📌 잘못된 라우터의 사용
+-
+* 아래와 같은 에러가 발생할 수 있음
+```text
+Error in render: "TypeError: Cannot read property 'matched' of undefined"
+```
+* 위 내용은, 라우터의 이름을 router가 아닌 다른 이름으로 사용했을 경우 발생
+* 예를들어서, routes 나 Router 같은 키를 의미 따라서, 아래와 같이 작성
+```javascript
+// 틀림
+import Router from './router/index'
+
+new Vue({
+  render: h => h(App),
+  Router, 
+}).$mount('#app')
+
+// 아래와 같이 작성
+import router from './router/index'
+
+new Vue({
+  render: h => h(App),
+  router,
+}).$mount('#app')
+```
 
 

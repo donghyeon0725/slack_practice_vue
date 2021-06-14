@@ -5,6 +5,12 @@ import store from '@/store/index'; // vuex import
 import '@/filter/index'; // filter
 import globalPlugin from '@/global/index'; // global
 
+// 웹소켓
+import eventBus from '@/socket/event-bus';
+import realTimeClient from '@/socket/real-time-client';
+Vue.prototype.$bus = eventBus;
+Vue.prototype.$rt = realTimeClient;
+
 // 부트 스트랩
 import { BootstrapVue, IconsPlugin } from 'bootstrap-vue';
 import 'bootstrap/dist/css/bootstrap.css';

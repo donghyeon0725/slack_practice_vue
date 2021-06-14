@@ -30,6 +30,8 @@ const router = new VueRouter({
       component: () => import('@/views/MainPage.vue'),
       meta: {
         auth: true,
+        socket: true,
+        socket_target: 'team',
       },
       children: [
         {
@@ -61,7 +63,7 @@ const router = new VueRouter({
 }); // 새로운 라우터를 생성해서 export
 
 // 라우터 가드
-router.beforeEach((to, from, next) => {
+router.beforeEach(async (to, from, next) => {
   // 로그인 상태일 때는 다시 로그인 페이지레 들어갈 수 없음
   if (to.path == '/login' && store.state.email != '') {
     next('/main');
@@ -76,6 +78,7 @@ router.beforeEach((to, from, next) => {
     // return 필수
     return;
   }
+
   // 이외 경우는 모두, 원래대로 진행한다.
   next();
 });

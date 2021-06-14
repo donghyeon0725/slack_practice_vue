@@ -11,6 +11,8 @@
 
 <script>
 import Side from '@/views/MainSidePage';
+import { getSocketUrl } from '@/api/socket';
+import socket from '@/socket/real-time-client';
 
 export default {
   name: 'MainPage',
@@ -20,7 +22,14 @@ export default {
       loading: false, // true로 변경해서 확인해보세요.
     };
   },
-  async created() {},
+  async created() {
+    await getSocketUrl().then(s => {
+      let url = s.data;
+      console.log(url);
+      socket.init(url, this.$store.state.token);
+    });
+  },
+  updated() {},
 };
 </script>
 

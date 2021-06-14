@@ -56,6 +56,30 @@ export default {
         }
       }
     },
+    onRealTimeHandler({ type, data }) {
+      console.log(type);
+      console.log(data);
+      if (this.$isEmpty(data)) {
+        this.$store.dispatch(type, this);
+      } else {
+        console.log(JSON.parse(data));
+        this.$store.dispatch(type, JSON.parse(data));
+      }
+    },
+    async subscribe() {
+      let teamId = this.$route.params.teamId;
+      if (this.$isNotEmpty(teamId)) {
+        let teams = this.$store.state.page.teams;
+        teams = teams.filter(s => s.id == teamId);
+        if (teams.length > 0) {
+          console.log('subscribe team ' + teamId);
+          this.$rt.subscribe(
+            this.$rt.channel.team(teamId),
+            this.onRealTimeHandler,
+          );
+        }
+      }
+    },
   },
   watch: {
     // prop을 watch 하려면 deep 모드를 켜야한다.
@@ -65,6 +89,7 @@ export default {
       handler() {
         // state의 값을 변화 시키기
         this.getBoards();
+        this.subscribe();
       },
     },
   },
