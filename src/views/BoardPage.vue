@@ -113,6 +113,8 @@
       </b-button>
 
       <CardForm id="card-create-modal"></CardForm>
+
+      <Chat></Chat>
     </div>
 
     <!-- 카드 수정하기 폼 -->
@@ -136,6 +138,7 @@ import CardEditForm from '@/components/main/center/CardEditForm';
 import CardDetailForm from '@/components/main/center/CardDetailForm';
 import AutoComplete from '@/components/common/AutoComplete';
 import BoardBanner from '@/components/main/center/BoardBanner';
+import Chat from '@/components/main/center/TeamChat';
 
 export default {
   name: 'BoardPage',
@@ -147,6 +150,7 @@ export default {
     CardDetailForm,
     AutoComplete,
     BoardBanner,
+    Chat,
   },
   data() {
     return {
@@ -351,6 +355,7 @@ export default {
   position: fixed;
   right: 10vw;
   bottom: 10vh;
+  display: flex;
 }
 
 .card-create-btn {
@@ -359,6 +364,7 @@ export default {
   height: 60px;
   border: 1px solid gray;
   padding: 7px;
+  margin-right: 10px;
 }
 .title {
   font-weight: 900;

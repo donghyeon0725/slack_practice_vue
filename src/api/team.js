@@ -46,6 +46,21 @@ function getTeamMember(teamId) {
   return instance.get(`teams/members/${teamId}`);
 }
 
+// 채팅 불러오기
+function getTeamChat(page, size, teamId) {
+  return instance.get(`teams/chat/${teamId}?page=${page}&size=${size}`);
+}
+
+// 채팅 삭제하기
+function deleteTeamChat(chatId) {
+  return instance.delete(`teams/chat/${chatId}`);
+}
+
+// 채팅 생성하기
+function createTeamChat(chatData) {
+  return instance.post('teams/chat', chatData);
+}
+
 export {
   getTeams,
   createTeam,
@@ -54,4 +69,7 @@ export {
   inviteTeam,
   acceptInvite,
   getTeamMember,
+  getTeamChat,
+  deleteTeamChat,
+  createTeamChat,
 };

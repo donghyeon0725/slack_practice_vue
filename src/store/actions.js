@@ -79,7 +79,8 @@ const actions = {
     }
   },
   async onCardAdd(context, card) {
-    context.commit('addCard', card);
+    if (context.state.page.cards.filter(s => s.id == card.id).length == 0)
+      context.commit('addCard', card);
   },
   async onCardDelete(context, card) {
     context.commit('deleteCard', card);
@@ -98,6 +99,13 @@ const actions = {
   async onCardSelected(context, card) {
     let c = context.state.page.cards.filter(s => s.id == card.id)[0];
     c.isSelected = true;
+  },
+  async onChatAdded(context, chat) {
+    if (context.state.page.teamChats.filter(s => s.id == chat.id).length == 0)
+      context.commit('addChat', chat);
+  },
+  async onChatUpdated(context, chat) {
+    context.commit('updateChat', chat);
   },
 };
 

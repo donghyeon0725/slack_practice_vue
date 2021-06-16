@@ -33,13 +33,34 @@ const mutations = {
     state.page.cards.push(card);
   },
   deleteCard(state, card) {
-    state.page.cards = state.page.cards.filter(s => s.id != card.id);
+    let cards = state.page.cards;
+    for (let i = 0; i < cards.length; i++) {
+      if (cards[i].id == card.id) {
+        cards.splice(i, 1);
+        break;
+      }
+    }
   },
   updateCard(state, card) {
     let cards = state.page.cards;
     for (let i = 0; i < cards.length; i++) {
       if (cards[i].id == card.id) {
         cards.splice(i, 1, card);
+        break;
+      }
+    }
+  },
+  setChats(state, list) {
+    state.page.teamChats = list;
+  },
+  addChat(state, chat) {
+    state.page.teamChats.push(chat);
+  },
+  updateChat(state, chat) {
+    let chats = state.page.teamChats;
+    for (let i = 0; i < chats.length; i++) {
+      if (chats[i].id == chat.id) {
+        chats.splice(i, 1, chat);
         break;
       }
     }

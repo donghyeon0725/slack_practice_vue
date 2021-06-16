@@ -7,6 +7,7 @@ const PAGE_DATA = () => {
     cards: [],
     members: [],
     filterWord: '',
+    teamChats: [],
   };
 };
 

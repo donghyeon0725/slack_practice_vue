@@ -14,7 +14,20 @@ export default {
     Header,
   },
   watch: {
-    $route() {
+    $route(to, from) {
+      if (to.path != from.path) {
+        if (from.meta.socket) {
+          let toTeamId = to.params.teamId;
+          let fromTeamId = from.params.teamId;
+          if (this.$isNotEmpty(fromTeamId) && fromTeamId != toTeamId) {
+            console.log('unsubscribe team ' + fromTeamId);
+            this.$rt.unsubscribe(
+              this.$rt.channel[from.meta.socket_target](fromTeamId),
+              this.onRealTimeHandler,
+            );
+          }
+        }
+      }
       /*if (to.path != from.path) {
         /!* router path가 변경될 때마다 호출 *!/
         let toTeamId = to.params.teamId;
