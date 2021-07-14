@@ -57,13 +57,11 @@ export default {
       }
     },
     onRealTimeHandler({ type, data }) {
-      console.log(type);
-      console.log(data);
       if (this.$isEmpty(data)) {
         this.$store.dispatch(type, this);
       } else {
-        console.log(JSON.parse(data));
-        this.$store.dispatch(type, JSON.parse(data));
+        console.log(type, data);
+        this.$store.dispatch(type, data);
       }
     },
     async subscribe() {
