@@ -35,7 +35,7 @@ function acceptInvite(email, token) {
     { email: email },
     {
       headers: {
-        Authorization: token,
+        Authorization: `bearer ${token}`,
       },
     },
   );

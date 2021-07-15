@@ -21,7 +21,7 @@ function signupMail(email) {
 function join(formData, joinToken) {
   return ins.post('users', formData, {
     headers: {
-      Authorization: joinToken,
+      Authorization: `bearer ${joinToken}`,
     },
   });
 }
