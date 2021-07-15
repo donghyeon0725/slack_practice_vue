@@ -6,7 +6,7 @@ export function setInterceptors(instance) {
     function (config) {
       // Do something before request is sent
       // console.log(config);
-      config.headers['X-AUTH-TOKEN'] = store.state.token;
+      config.headers['Authorization'] = store.state.token;
       return config;
     },
     function (error) {
