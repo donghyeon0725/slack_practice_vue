@@ -7,8 +7,7 @@ import Demo from '@/assets/lasdw.js'
 
 * 이는 node js의 (view 모듈의) 도움을 받아 사용하는 것이다. 
     1. jsconfig.json 파일 생성
-
-    2. ```javascript
+---
     {
       "compilerOptions": {
         "baseUrl": ".",
@@ -26,7 +25,7 @@ import Demo from '@/assets/lasdw.js'
         "dist"
       ]
     }
-    ```
+---
     
 
 * 만약 인텔리제이에서 이 기능이 되지 않는 경우 아래와 같이 추가 세팅
